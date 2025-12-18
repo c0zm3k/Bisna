@@ -99,41 +99,33 @@
                     <h6 class="fw-bold mb-4 text-accent uppercase tracking-widest" style="font-size: 0.7rem;">ACTIVE
                         ADMINISTRATORS</h6>
                     {% if verified_admins %}
-                    <div class="table-responsive">
-                        <table class="table table-hover border-glass align-middle">
-                            <tbody class="text-white">
-                                {% for user in verified_admins %}
-                                <tr class="user-row clickable-row border-glass hover-lift" data-bs-toggle="modal"
-                                    data-bs-target="#adminModal" data-username="{{ user.username }}"
-                                    data-email="{{ user.email }}" data-user-id="{{ user.id }}"
-                                    data-college="{{ user.college.name }}"
-                                    data-delete-url="{{ url_for('super_admin.delete_admin', user_id=user.id) }}"
-                                    data-report-url="{{ url_for('super_admin.user_report', user_id=user.id) }}"
-                                    style="cursor: pointer;">
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="rounded-circle bg-glass p-2 border border-glass">
-                                                <i class="fas fa-user-shield text-accent"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold">{{ user.username }}</div>
-                                                <div class="small text-muted" style="font-size: 0.7rem;">{{
-                                                    user.college.name }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-end">
-                                        {% if user.is_online %}
-                                        <div class="bg-accent rounded-circle mx-auto"
-                                            style="width: 6px; height: 6px; box-shadow: 0 0 10px var(--accent-primary);"
-                                            title="Online"></div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    {% for user in verified_admins %}
+                    <div class="user-row clickable-row bg-glass border border-glass rounded-3 p-3 mb-2 hover-lift"
+                        data-bs-toggle="modal" data-bs-target="#adminModal" data-username="{{ user.username }}"
+                        data-email="{{ user.email }}" data-user-id="{{ user.id }}"
+                        data-college="{{ user.college.name }}"
+                        data-delete-url="{{ url_for('super_admin.delete_admin', user_id=user.id) }}"
+                        data-report-url="{{ url_for('super_admin.user_report', user_id=user.id) }}"
+                        style="cursor: pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-glass p-2 border border-glass">
+                                    <i class="fas fa-user-shield text-accent"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ user.username }}</div>
+                                    <div class="small text-muted" style="font-size: 0.7rem;">{{ user.college.name }} ({{
+                                        user.email }})</div>
+                                </div>
+                            </div>
+                            {% if user.is_online %}
+                            <div class="bg-accent rounded-circle"
+                                style="width: 6px; height: 6px; box-shadow: 0 0 10px var(--accent-primary);"
+                                title="Online"></div>
+                            {% endif %}
+                        </div>
                     </div>
+                    {% endfor %}
                     {% else %}
                     <p class="text-muted small text-center py-4">No verified admin nodes active.</p>
                     {% endif %}
