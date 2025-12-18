@@ -8,7 +8,8 @@ A modern, mobile-responsive college management system with a DARKYN-inspired dar
 Upload this project to a private or public GitHub repository.
 
 ### 2. Configure Render Web Service
-- **Environment**: Python
+> [!IMPORTANT]
+> Render often defaults to `gunicorn app:app`. You **MUST** change it to the following in your Render Dashboard settings or it will crash:
 - **Build Command**: `./render-build.sh`
 - **Start Command**: `gunicorn run:app`
 
