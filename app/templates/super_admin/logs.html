@@ -1,44 +1,48 @@
 {% extends "base.html" %}
-
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <h2>{{ title }}</h2>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <a href="{{ url_for('super_admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
-            <a href="{{ url_for('super_admin.download_all_logs') }}" class="btn btn-success">
-                <i class="fas fa-download me-1"></i> Download CSV
+<div class="flex flex-col gap-8 max-w-6xl mx-auto py-8 px-4">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 class="text-3xl font-black text-soft-dark tracking-tight">{{ title }}</h2>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="{{ url_for('super_admin.dashboard') }}"
+                class="nm-button inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-soft-dark no-underline rounded-xl border border-gray-200 hover:border-soft-primary/30 hover:bg-soft-primary/5 transition-colors">
+                <i class="fas fa-arrow-left text-soft-primary"></i> Back to Dashboard
+            </a>
+            <a href="{{ url_for('super_admin.download_all_logs') }}"
+                class="nm-button inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white no-underline rounded-xl bg-soft-primary hover:opacity-90 transition-opacity">
+                <i class="fas fa-download"></i> Download CSV
             </a>
         </div>
     </div>
-</div>
 
-<div class="card">
-    <div class="card-body">
-        <table class="table table-striped">
-            <thead>
+    <div class="nm-flat rounded-2xl overflow-hidden">
+        <div class="p-6 overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="border-b border-gray-200 bg-gray-50/80">
                 <tr>
-                    <th>Timestamp</th>
-                    <th>User</th>
-                    <th>Action</th>
-                    <th>Details</th>
+                    <th class="px-4 py-3 font-black text-soft-dark uppercase tracking-wider text-xs">Timestamp</th>
+                    <th class="px-4 py-3 font-black text-soft-dark uppercase tracking-wider text-xs">User</th>
+                    <th class="px-4 py-3 font-black text-soft-dark uppercase tracking-wider text-xs">Action</th>
+                    <th class="px-4 py-3 font-black text-soft-dark uppercase tracking-wider text-xs">Details</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-100">
                 {% for log in logs %}
-                <tr>
-                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    <td>{{ log.user.username }} ({{ log.user.email }})</td>
-                    <td>{{ log.action }}</td>
-                    <td>{{ log.details }}</td>
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-4 py-3 text-soft-dark font-medium">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="px-4 py-3 text-soft-primary font-bold">{{ log.user.username }} ({{ log.user.email }})</td>
+                    <td class="px-4 py-3 text-soft-dark">{{ log.action }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ log.details }}</td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="4" class="text-center">No activity logs found.</td>
+                    <td colspan="4" class="px-4 py-12 text-center text-gray-500 font-medium">No activity logs found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 {% endblock %}

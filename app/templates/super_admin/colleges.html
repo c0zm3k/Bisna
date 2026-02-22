@@ -3,62 +3,65 @@
 {% block content %}
 <div class="flex flex-col gap-10 max-w-6xl mx-auto py-8 px-4">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
             <h2 class="text-4xl font-black text-soft-dark tracking-tight">Institutional <span
                     class="text-soft-primary">Registry</span></h2>
-            <p class="text-[0.65rem] font-bold text-soft-primary uppercase tracking-[0.2em] opacity-60">Manage
+            <p class="text-[0.65rem] font-bold text-soft-primary uppercase tracking-[0.2em] opacity-60 mt-1">Manage
                 across-node college registrations</p>
         </div>
-        <div class="flex gap-4">
-            <a href="{{ url_for('super_admin.add_college') }}"
-                class="nm-button flex items-center gap-2 text-sm font-black bg-soft-primary/5">
-                <i class="fas fa-plus-circle"></i> Register College
-            </a>
-        </div>
+        <a href="{{ url_for('super_admin.add_college') }}"
+            class="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-black text-white no-underline bg-soft-primary hover:bg-soft-accent shadow-lg shadow-soft-primary/20 hover:shadow-soft-primary/30 hover:-translate-y-0.5 transition-all duration-200">
+            <i class="fas fa-plus text-[0.8rem]"></i> Register College
+        </a>
     </div>
 
-    <!-- Colleges Grid -->
-    <div class="nm-flat p-6 md:p-10">
+    <!-- Global Database Section -->
+    <div class="rounded-3xl border border-gray-100 bg-white p-8 md:p-10 shadow-sm">
         <div class="flex items-center gap-4 mb-10">
-            <div class="nm-inset p-3 rounded-2xl text-soft-primary">
-                <i class="fas fa-university text-xl"></i>
+            <div class="w-14 h-14 rounded-2xl bg-soft-primary/10 flex items-center justify-center text-soft-primary">
+                <i class="fas fa-university text-2xl"></i>
             </div>
             <div>
-                <h5 class="text-xs font-black text-soft-dark uppercase tracking-[0.2em] leading-none mb-1">Global
-                    Database</h5>
-                <p class="text-[0.6rem] font-bold text-soft-primary uppercase tracking-widest opacity-60">Verified
-                    Educational Nodes</p>
+                <h3 class="text-sm font-black text-soft-dark uppercase tracking-[0.2em] leading-none">Global Database</h3>
+                <p class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest mt-1">Verified educational nodes</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% if colleges %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for college in colleges %}
-            <div
-                class="nm-flat p-8 flex flex-col hover:scale-[1.03] transition-transform duration-500 border-t-4 border-soft-primary/10">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="nm-inset w-12 h-12 flex items-center justify-center rounded-xl text-soft-primary">
-                        <i class="fas fa-school text-xl"></i>
+            <a href="{{ url_for('super_admin.edit_college', college_id=college.id) }}"
+                class="group flex flex-col rounded-2xl border-2 border-gray-100 bg-white p-6 no-underline text-inherit hover:border-soft-primary/30 hover:shadow-xl hover:shadow-soft-primary/5 transition-all duration-300">
+                <div class="flex justify-between items-start mb-5">
+                    <div class="w-12 h-12 rounded-xl bg-soft-primary/10 flex items-center justify-center text-soft-primary group-hover:bg-soft-primary group-hover:text-white transition-colors duration-300">
+                        <i class="fas fa-school text-lg"></i>
                     </div>
-                    <div
-                        class="nm-inset px-4 py-2 rounded-full text-[0.6rem] font-black text-soft-primary uppercase tracking-widest bg-white/30">
-                        {{ college.users|length }} Entities
-                    </div>
+                    <span class="px-3 py-1.5 rounded-full text-[0.6rem] font-black text-soft-primary uppercase tracking-wider bg-soft-primary/10 group-hover:bg-soft-primary/20">
+                        {{ college.users|length }} entities
+                    </span>
                 </div>
-
-                <h4 class="text-2xl font-black text-soft-dark mb-2 leading-tight tracking-tight">{{ college.name }}</h4>
-                <div class="text-[0.65rem] font-black text-soft-primary uppercase tracking-widest opacity-60 mb-8">
-                    NODE_ID: {{ college.formatted_id }}</div>
-
-                <div class="mt-auto flex gap-3">
-                    <a href="{{ url_for('super_admin.edit_college', college_id=college.id) }}"
-                        class="nm-button flex-1 py-4 text-[0.65rem] font-black uppercase tracking-[0.2em] no-underline">
-                        <i class="fas fa-cog mr-2"></i> Configure
-                    </a>
+                <h4 class="text-xl font-black text-soft-dark mb-1.5 leading-tight tracking-tight group-hover:text-soft-primary transition-colors">{{ college.name }}</h4>
+                <p class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest mb-6">Node {{ college.formatted_id }}</p>
+                <div class="mt-auto flex items-center gap-2 text-[0.65rem] font-black text-gray-400 uppercase tracking-wider group-hover:text-soft-primary transition-colors">
+                    <i class="fas fa-cog opacity-60 group-hover:opacity-100"></i> Configure
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
+        {% else %}
+        <div class="text-center py-16 px-6 rounded-2xl bg-gray-50/80 border-2 border-dashed border-gray-200">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-soft-primary/10 flex items-center justify-center text-soft-primary">
+                <i class="fas fa-university text-2xl"></i>
+            </div>
+            <p class="text-soft-dark font-bold mb-1">No colleges registered</p>
+            <p class="text-sm text-gray-500 mb-6">Add your first institution to get started.</p>
+            <a href="{{ url_for('super_admin.add_college') }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-soft-primary hover:bg-soft-accent no-underline transition-colors">
+                <i class="fas fa-plus"></i> Register College
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

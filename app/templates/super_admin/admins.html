@@ -2,25 +2,60 @@
 {% block title %}Manage Admins{% endblock %}
 {% block scripts %}
 <script>
+(function () {
+    function forceCloseAdminModal() {
+        var el = document.getElementById('adminModal');
+        if (!el) return;
+        el.classList.remove('show');
+        el.style.display = 'none';
+        el.setAttribute('aria-hidden', 'true');
+        el.removeAttribute('aria-modal');
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        var backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(function (b) { b.remove(); });
+        if (window.location.hash === '#adminModal') {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
-        const adminModal = document.getElementById('adminModal');
-        if (adminModal) {
-            adminModal.addEventListener('show.bs.modal', function (event) {
-                const trigger = event.relatedTarget;
-                const row = trigger.closest('.user-row') || trigger.closest('.clickable-row') || trigger;
-                const username = row.getAttribute('data-username') || 'N/A';
-                const email = row.getAttribute('data-email') || 'N/A';
-                const college = row.getAttribute('data-college') || 'N/A';
-                const deleteUrl = row.getAttribute('data-delete-url') || '';
-                const reportUrl = row.getAttribute('data-report-url') || '#';
-                adminModal.querySelector('#modal-username').innerText = username;
-                adminModal.querySelector('#modal-email').innerText = email;
-                adminModal.querySelector('#modal-college').innerText = college;
-                adminModal.querySelector('#modal-delete-form').action = deleteUrl;
-                adminModal.querySelector('#modal-report-link').href = reportUrl;
+        var adminModalEl = document.getElementById('adminModal');
+        if (!adminModalEl) return;
+
+        adminModalEl.style.display = 'none';
+
+        forceCloseAdminModal();
+        window.addEventListener('hashchange', forceCloseAdminModal);
+
+        document.querySelectorAll('.user-row.admin-card').forEach(function (row) {
+            row.addEventListener('click', function () {
+                if (!row.getAttribute('data-username')) return;
+                adminModalEl.querySelector('#modal-username').innerText = row.getAttribute('data-username') || 'N/A';
+                adminModalEl.querySelector('#modal-email').innerText = row.getAttribute('data-email') || 'N/A';
+                adminModalEl.querySelector('#modal-college').innerText = row.getAttribute('data-college') || 'N/A';
+                adminModalEl.querySelector('#modal-delete-form').action = row.getAttribute('data-delete-url') || '';
+                adminModalEl.querySelector('#modal-report-link').href = row.getAttribute('data-report-url') || '#';
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    bootstrap.Modal.getOrCreateInstance(adminModalEl).show();
+                }
+            });
+        });
+
+        var closeBtn = adminModalEl.querySelector('[data-bs-dismiss="modal"]');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                forceCloseAdminModal();
             });
         }
+
+        document.addEventListener('click', function (e) {
+            if (e.target.classList && e.target.classList.contains('modal-backdrop')) forceCloseAdminModal();
+        });
     });
+})();
 </script>
 {% endblock %}
 {% block content %}
@@ -28,7 +63,7 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
-            <h2 class="text-4xl font-black text-soft-dark tracking-tight">Approve <span
+            <h2 class="text-4xl font-black text-soft-dark tracking-tight">Manage <span
                     class="text-soft-primary">Admins</span></h2>
             <p class="text-[0.65rem] font-bold text-soft-primary uppercase tracking-[0.2em] opacity-60">Manage
                 admins for different colleges</p>
@@ -57,8 +92,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% if verified_admins %}
             {% for user in verified_admins %}
-            <div class="user-row nm-inset p-6 flex justify-between items-center group cursor-pointer hover:shadow-2xl transition-all"
-                data-bs-toggle="modal" data-bs-target="#adminModal" data-username="{{ user.username }}"
+            <div class="user-row admin-card nm-inset p-6 flex justify-between items-center group cursor-pointer hover:shadow-2xl transition-all"
+                data-username="{{ user.username }}"
                 data-email="{{ user.email }}" data-user-id="{{ user.id }}" data-college="{{ user.college.name }}"
                 data-delete-url="{{ url_for('super_admin.delete_admin', user_id=user.id) }}"
                 data-report-url="{{ url_for('super_admin.user_report', user_id=user.id) }}">
@@ -98,18 +133,6 @@
                 <p id="modal-email" class="text-soft-primary font-bold opacity-70 mb-4"></p>
                 <div id="modal-college"
                     class="nm-flat px-4 py-1.5 inline-block rounded-full text-[0.65rem] font-black text-soft-primary uppercase tracking-widest bg-white/40 mb-8">
-                </div>
-
-                <div class="nm-inset p-5 rounded-2xl flex items-center gap-4 text-left border border-red-500/10">
-                    <div
-                        class="w-12 h-12 flex-shrink-0 nm-flat rounded-xl flex items-center justify-center text-red-600">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div>
-                        <div class="text-[0.6rem] font-black text-red-600 uppercase tracking-widest mb-1">Warning</div>
-                        <p class="text-[0.65rem] font-bold text-soft-primary leading-tight">Removing this admin will
-                            also remove their access to all their college materials.</p>
-                    </div>
                 </div>
 
                 <div class="flex gap-4 mt-8">
