@@ -21,6 +21,16 @@ def register():
             
         hashed_password = generate_password_hash(form.password.data)
         
+        # Check for existing user credentials
+        existing_user = User.query.filter((User.email == form.email.data.strip().lower()) | 
+                                         (User.username == form.username.data.strip())).first()
+        if existing_user:
+            if existing_user.email == form.email.data.strip().lower():
+                flash('Email address is already in use.', 'danger')
+            else:
+                flash('Username is already taken.', 'danger')
+            return render_template('auth/register.html', title='Register', form=form)
+
         # Single College Architecture: Always use the first seeded college
         primary_college = College.query.first()
         if not primary_college:
@@ -62,7 +72,11 @@ def register():
 
         # Faculty logic
         elif role.name == 'Faculty':
-             user = User(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_password, role=role,
+             username = form.username.data.strip()
+             email = form.email.data.strip().lower()
+             name = (form.name.data or "").strip()
+             
+             user = User(username=username, name=name, email=email, password_hash=hashed_password, role=role,
                         college_id=college_id, is_verified=False)
              db.session.add(user)
              db.session.commit()
