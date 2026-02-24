@@ -5,9 +5,7 @@ from flask_wtf.file import FileField, FileAllowed
 from app.models import User
 
 class RegistrationForm(FlaskForm):
-    role = SelectField('Role', choices=[('Student', 'Student'), ('Teacher', 'Teacher'), ('Admin', 'Admin')], validators=[DataRequired()])
-    college = SelectField('College', coerce=int, validators=[Optional()]) # Used for Admin
-    college_id = StringField('College ID (e.g., CIDA001)', validators=[Optional()]) # Used for Teacher/Student
+    role = SelectField('Role', choices=[('Student', 'Student'), ('Faculty', 'Faculty')], validators=[DataRequired()])
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     name = StringField('Full Name', validators=[Optional(), Length(max=120)])
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -17,67 +15,14 @@ class RegistrationForm(FlaskForm):
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
 
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('That username is taken. Please choose a different one.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('That email is taken. Please choose a different one.')
-
-class AdminRegistrationForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
-    name = StringField('Full Name', validators=[DataRequired(), Length(max=120)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    college = SelectField('College', coerce=int, validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register as Admin')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('That username is taken. Please choose a different one.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('That email is taken. Please choose a different one.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('That email is taken. Please choose a different one.')
-
-class SuperAdminRegistrationForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
-    name = StringField('Full Name', validators=[DataRequired(), Length(max=120)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register as Super Admin')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('That username is taken. Please choose a different one.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('That email is taken. Please choose a different one.')
-
 class CSVUploadForm(FlaskForm):
     file = FileField('Upload Student Registry (CSV/Excel)', validators=[DataRequired(), FileAllowed(['csv', 'xlsx'], 'CSV or Excel only!')])
-    submit = SubmitField('Upload')
+    submit = SubmitField('Upload Bulk Data')
+
+class SingleRegistryForm(FlaskForm):
+    register_number = StringField('Register Number', validators=[DataRequired(), Length(max=50)])
+    email = StringField('Email Address', validators=[DataRequired(), Email(), Length(max=120)])
+    submit = SubmitField('Add to Registry')
 
 class LoginForm(FlaskForm):
     email = StringField('Email',
@@ -85,11 +30,9 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     role = SelectField('Role', choices=[
         ('Student', 'Student'), 
-        ('Teacher', 'Teacher'), 
-        ('Admin', 'Admin'), 
-        ('Super Admin', 'Super Admin')
+        ('Faculty', 'Faculty'), 
+        ('Admin', 'Admin')
     ], validators=[DataRequired()])
-    college_id = StringField('College ID', validators=[Optional()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 

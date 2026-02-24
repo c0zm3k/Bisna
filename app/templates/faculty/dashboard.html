@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Teacher Dashboard{% endblock %}
+{% block title %}Faculty Dashboard{% endblock %}
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -27,8 +27,9 @@
     <div class="flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
             <h2 class="text-3xl font-black text-soft-dark tracking-tight mb-1">Teacher <span
-                    class="text-soft-primary">Portal</span></h2>
-            <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest">Academic Module Management</p>
+                    class="text-soft-primary">Home</span></h2>
+            <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest">Manage classes and study
+                materials</p>
         </div>
         <div class="bg-white border border-gray-100 px-5 py-2 rounded-full flex items-center gap-3 shadow-sm">
             <div class="w-1.5 h-1.5 bg-soft-primary rounded-full animate-pulse"></div>
@@ -57,9 +58,9 @@
         <div class="mat-card p-6 sm:col-span-2 lg:col-span-2 border-none shadow-md">
             <div class="flex items-center justify-between px-2">
                 <div class="text-start">
-                    <div class="text-sm font-bold text-soft-dark uppercase tracking-wide">Registry Control</div>
-                    <div class="text-[0.65rem] font-medium text-gray-400 uppercase tracking-widest">Manage class
-                        enrollment</div>
+                    <div class="text-sm font-bold text-soft-dark uppercase tracking-wide">Students</div>
+                    <div class="text-[0.65rem] font-medium text-gray-400 uppercase tracking-widest">View your student
+                        list</div>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-soft-primary">
                     <i class="fas fa-user-graduate text-xl"></i>
@@ -76,23 +77,23 @@
                 <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-soft-primary">
                     <i class="fas fa-bolt"></i>
                 </div>
-                <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">Rapid Controls</h5>
+                <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">Quick Actions</h5>
             </div>
             <div class="flex flex-col gap-4">
                 <a href="{{ url_for('notes.upload_note') }}"
                     class="mat-button mat-button-primary p-5 no-underline group shadow-lg rounded-2xl flex justify-between items-center transition-all">
-                    <span class="text-[0.75rem] font-bold uppercase tracking-tight">Upload Material</span>
+                    <span class="text-[0.75rem] font-bold uppercase tracking-tight">Post New Note</span>
                     <i class="fas fa-plus text-[0.7rem] opacity-50 group-hover:opacity-100 transition-opacity"></i>
                 </a>
                 <a href="{{ url_for('notes.list_notes') }}"
                     class="bg-gray-50 hover:bg-gray-100 p-5 rounded-2xl no-underline group flex justify-between items-center transition-all">
-                    <span class="text-[0.75rem] font-bold text-soft-dark uppercase tracking-tight">Module Grid</span>
+                    <span class="text-[0.75rem] font-bold text-soft-dark uppercase tracking-tight">Note Library</span>
                     <i
                         class="fas fa-external-link-alt text-[0.7rem] text-gray-300 group-hover:text-soft-primary transition-opacity"></i>
                 </a>
                 <a href="{{ url_for('notes.verification_queue') }}"
                     class="bg-gray-50 hover:bg-gray-100 p-5 rounded-2xl no-underline group flex justify-between items-center transition-all">
-                    <span class="text-[0.75rem] font-bold text-soft-dark uppercase tracking-tight">Review Queue</span>
+                    <span class="text-[0.75rem] font-bold text-soft-dark uppercase tracking-tight">Review Notes</span>
                     <span class="bg-white border border-gray-100 px-3 py-1 rounded-full text-[0.6rem] font-bold">{{
                         pending_notes|length }}</span>
                 </a>
@@ -106,7 +107,7 @@
                     <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-soft-primary">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">Student Console</h5>
+                    <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">Class Directory</h5>
                 </div>
                 <a href="{{ url_for('main.view_student_logs') }}"
                     class="mat-button mat-button-outline px-5 py-2 text-[0.65rem] font-bold uppercase no-underline rounded-full flex items-center gap-2">
@@ -126,9 +127,9 @@
                             <div>
                                 <div
                                     class="text-lg font-bold text-soft-dark uppercase tracking-tight group-hover:text-soft-primary transition-colors">
-                                    Access Registry</div>
+                                    View Students</div>
                                 <p class="text-[0.65rem] text-gray-400 font-bold uppercase tracking-widest mt-1">
-                                    {{ verified_students|length }} Finalized Enrollments</p>
+                                    {{ verified_students|length }} Registered Students</p>
                             </div>
                         </div>
                         <i class="fas fa-chevron-right text-gray-200 group-hover:text-soft-primary transition-all"></i>
@@ -138,52 +139,95 @@
 
             <div class="mt-8 pt-8 border-t border-gray-50 flex items-center justify-between">
                 <span class="text-[0.6rem] font-bold text-gray-300 uppercase tracking-widest">Authority Level</span>
-                <span class="text-[0.6rem] font-bold text-soft-primary/40 uppercase tracking-widest">Verified Faculty
+                <span class="text-[0.6rem] font-bold text-soft-primary/40 uppercase tracking-widest">Teacher
                     Access</span>
             </div>
         </div>
     </div>
 
-    <!-- Syllabus Management -->
+    <!-- Course Curriculum -->
     <div class="mat-card p-8">
         <div class="flex items-center gap-4 mb-10">
             <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-soft-primary">
-                <i class="fas fa-cube text-lg"></i>
+                <i class="fas fa-graduation-cap text-lg"></i>
             </div>
             <div>
-                <h5 class="text-base font-bold text-soft-dark uppercase tracking-wider">Academic Matrix</h5>
-                <p class="text-[0.65rem] font-medium text-gray-400">Deployed Courses & Subordinate Subjects</p>
+                <h5 class="text-base font-bold text-soft-dark uppercase tracking-wider">My Courses</h5>
+                <p class="text-[0.65rem] font-medium text-gray-400">Subject curriculum overview</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for course in courses %}
-            <div
-                class="bg-white border border-gray-100 p-6 rounded-3xl hover:border-soft-primary/20 transition-all shadow-sm">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-soft-primary">
-                        <i class="fas fa-book"></i>
+            <div class="nm-flat overflow-hidden border border-gray-100/50 flex flex-col h-fit rounded-[2rem]">
+                <!-- Course Header Toggle -->
+                <div class="flex flex-col p-6 bg-white/40 hover:bg-white transition-all cursor-pointer group"
+                    data-bs-toggle="collapse" data-bs-target="#course-{{ course.id }}" aria-expanded="false">
+                    <div class="flex items-start justify-between mb-4">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-soft-bg flex items-center justify-center text-soft-primary shadow-sm">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <i
+                            class="fas fa-chevron-down text-gray-200 transition-transform group-aria-expanded:rotate-180"></i>
                     </div>
-                    <h4 class="text-xs font-bold text-soft-dark uppercase tracking-wider">{{ course.name }}</h4>
+
+                    <div>
+                        <h4 class="text-sm font-black text-soft-dark uppercase tracking-tight mb-1 leading-tight">{{
+                            course.name }}</h4>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-widest">{{
+                                course.semesters|length }} Semesters</span>
+                            <div class="w-1 h-1 rounded-full bg-gray-200"></div>
+                            <span class="text-[0.55rem] font-bold text-soft-primary/60 uppercase tracking-widest">Active
+                                Curriculum</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-6">
-                    {% for sem in course.semesters %}
-                    <div class="pl-4 border-l-2 border-gray-100">
-                        <span
-                            class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-widest block mb-3">Semester
-                            {{ sem.number }}</span>
-                        <div class="flex flex-col gap-2">
-                            {% for sub in sem.subjects %}
-                            <div
-                                class="bg-gray-50/50 p-3 rounded-xl flex justify-between items-center hover:bg-gray-50 transition-colors">
-                                <span class="text-[0.7rem] font-bold text-soft-dark/80">{{ sub.name }}</span>
-                                <span class="text-[0.6rem] font-bold text-gray-300 uppercase">{{ sub.units|length }}
-                                    Units</span>
+
+                <!-- Course Content (Semester Accordion) -->
+                <div class="collapse" id="course-{{ course.id }}">
+                    <div class="p-5 bg-gray-50/10 border-t border-gray-100/50">
+                        <div class="flex flex-col gap-3">
+                            {% for sem in course.semesters %}
+                            <div class="group/sem">
+                                <!-- Semester Header Toggle -->
+                                <div class="flex justify-between items-center p-3.5 rounded-2xl bg-white hover:bg-gray-50 transition-all cursor-pointer shadow-sm border border-gray-100/80"
+                                    data-bs-toggle="collapse" data-bs-target="#fs-{{ sem.id }}" aria-expanded="false">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-soft-primary/40"></div>
+                                        <span
+                                            class="text-[0.65rem] font-black text-soft-dark uppercase tracking-widest">Semester
+                                            {{ sem.number }}</span>
+                                        <span class="text-[0.55rem] font-bold text-gray-400 opacity-60 ml-1">({{
+                                            sem.subjects|length }} Subjects)</span>
+                                    </div>
+                                    <i
+                                        class="fas fa-plus text-[0.6rem] text-gray-200 group-aria-expanded/sem:rotate-45 transition-transform"></i>
+                                </div>
+
+                                <!-- Subjects List -->
+                                <div class="collapse" id="fs-{{ sem.id }}">
+                                    <div
+                                        class="flex flex-col gap-2 py-4 pl-5 border-l-2 border-soft-primary/5 ml-4 mt-1">
+                                        {% for sub in sem.subjects %}
+                                        <div
+                                            class="flex items-center justify-between py-1.5 pr-3 bg-white/50 rounded-xl px-3 border border-transparent hover:border-gray-100 transition-all">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fas fa-book-open text-[0.5rem] text-soft-primary/30"></i>
+                                                <span class="text-[0.6rem] font-bold text-gray-600 tracking-tight">{{
+                                                    sub.name }}</span>
+                                            </div>
+                                            <span class="text-[0.55rem] font-bold text-gray-300 uppercase">{{
+                                                sub.units|length }} Units</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
             </div>
             {% endfor %}

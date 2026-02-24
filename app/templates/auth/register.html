@@ -22,19 +22,6 @@
                         {{ form.role(class="mat-input h-11 text-sm cursor-pointer", id="role_select") }}
                     </div>
 
-                    <div id="college_dropdown_div" style="display: none;">
-                        <label
-                            class="block text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Select
-                            College</label>
-                        {{ form.college(class="mat-input h-11 text-sm cursor-pointer") }}
-                    </div>
-
-                    <div id="college_id_div" style="display: none;">
-                        <label
-                            class="block text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">College
-                            ID</label>
-                        {{ form.college_id(class="mat-input h-11 text-sm", placeholder="CIDA001") }}
-                    </div>
                 </div>
 
                 <!-- Username & Email -->
@@ -146,8 +133,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const roleSelect = document.getElementById('role_select');
-        const collegeDropdownDiv = document.getElementById('college_dropdown_div');
-        const collegeIdDiv = document.getElementById('college_id_div');
         const regNumDiv = document.getElementById('reg_num_div');
         const passwordInput = document.getElementById('password_input');
         const confirmPasswordInput = document.getElementById('confirm_password_input');
@@ -156,16 +141,9 @@
 
         function toggleFields() {
             const role = roleSelect.value;
-            collegeDropdownDiv.style.display = 'none';
-            collegeIdDiv.style.display = 'none';
             regNumDiv.style.display = 'none';
 
-            if (role === 'Admin') {
-                collegeDropdownDiv.style.display = 'block';
-            } else if (role === 'Teacher') {
-                collegeIdDiv.style.display = 'block';
-            } else if (role === 'Student') {
-                collegeIdDiv.style.display = 'block';
+            if (role === 'Student') {
                 regNumDiv.style.display = 'block';
             }
         }

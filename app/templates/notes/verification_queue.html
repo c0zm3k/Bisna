@@ -48,7 +48,7 @@
             <div class="nm-inset p-3 mb-6 flex-grow">
                 <p class="text-[0.55rem] font-bold text-soft-primary/60 uppercase leading-relaxed">
                     Topic: <span class="text-soft-dark">{{ note.topic.name }}</span><br>
-                    Phase: <span class="text-soft-dark">Semester {{ note.topic.unit.subject.semester.number }}</span>
+                    Semester: <span class="text-soft-dark">Semester {{ note.topic.unit.subject.semester.number }}</span>
                 </p>
             </div>
 
@@ -82,7 +82,7 @@
     {% endif %}
 
     <div class="text-center mt-12">
-        <a href="{{ url_for('main.teacher_dashboard') if current_user.role.name == 'Teacher' else url_for('admin.dashboard') }}"
+        <a href="{{ url_for('main.faculty_dashboard') if current_user.role.name == 'Faculty' else url_for('admin.dashboard') }}"
             class="text-[0.55rem] font-black text-soft-primary uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity no-underline">
             <i class="fas fa-chevron-left mr-1"></i> Return to Infrastructure
         </a>

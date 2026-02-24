@@ -6,7 +6,7 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-3">
-            <a href="{% if current_user.role.name == 'Admin' %}{{ url_for('admin.dashboard') }}{% else %}{{ url_for('main.teacher_dashboard') }}{% endif %}"
+            <a href="{% if current_user.role.name == 'Admin' %}{{ url_for('admin.dashboard') }}{% else %}{{ url_for('main.faculty_dashboard') }}{% endif %}"
                 class="nm-button w-10 h-10 flex items-center justify-center no-underline">
                 <i class="fas fa-chevron-left"></i>
             </a>

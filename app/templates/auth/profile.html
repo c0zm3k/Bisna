@@ -16,45 +16,43 @@
                 </h3>
                 <span
                     class="inline-block px-5 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-soft-primary bg-soft-bg border border-soft-primary/10 rounded-full">
-                    {{ current_user.role.name }} Node
+                    {{ current_user.role.name }} Profile
                 </span>
             </div>
 
             <div class="space-y-6 text-left">
                 <div class="bg-gray-50/50 border border-gray-100 p-6 rounded-2xl">
                     <label
-                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Digital
-                        Identity</label>
+                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Email
+                        Address</label>
                     <div class="text-soft-dark font-bold text-lg px-1">{{ current_user.email }}</div>
                 </div>
 
                 {% if current_user.college %}
                 <div class="bg-gray-50/50 border border-gray-100 p-6 rounded-2xl">
                     <label
-                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Institutional
-                        Anchor</label>
+                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">College</label>
                     <div class="text-soft-dark font-bold text-lg px-1 leading-tight">{{ current_user.college.name }}
                     </div>
-                    <div class="text-[0.6rem] font-bold text-soft-primary/60 mt-3 px-1 uppercase tracking-tighter">Node
-                        ID: {{ current_user.college.formatted_id }}</div>
+                    <div class="text-[0.6rem] font-bold text-soft-primary/60 mt-3 px-1 uppercase tracking-tighter">
+                        College Code: {{ current_user.college.formatted_id }}</div>
                 </div>
                 {% endif %}
 
                 {% if current_user.register_number %}
                 <div class="bg-gray-50/50 border border-gray-100 p-6 rounded-2xl">
                     <label
-                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Registry
-                        Index</label>
+                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Registration
+                        Number</label>
                     <div class="text-soft-dark font-bold text-lg px-1">{{ current_user.register_number }}</div>
                 </div>
                 {% endif %}
 
                 <div class="bg-gray-50/50 border border-gray-100 p-6 rounded-2xl group">
                     <label
-                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Security
-                        Protocol</label>
+                        class="block text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Security</label>
                     <div class="flex justify-between items-center px-1">
-                        <span class="text-soft-dark font-bold">Access Token</span>
+                        <span class="text-soft-dark font-bold text-sm">Update Password</span>
                         <button
                             class="mat-button mat-button-outline px-6 py-2 text-[0.65rem] font-bold uppercase tracking-widest rounded-full opacity-40 hover:opacity-100 transition-all">
                             <i class="fas fa-lock mr-2"></i>Reset
@@ -64,11 +62,11 @@
             </div>
 
             <div class="mt-16 pt-10 border-t border-gray-50">
-                <p class="text-gray-400 text-[0.6rem] font-bold uppercase tracking-widest mb-10">Compliance monitoring
-                    active across educational streams</p>
+                <p class="text-gray-400 text-[0.6rem] font-bold uppercase tracking-widest mb-10">Your account is
+                    protected by industry standard encryption</p>
                 <a href="{{ url_for('auth.logout') }}"
                     class="mat-button px-12 py-3.5 text-[0.7rem] font-black uppercase tracking-[0.2em] text-red-600 border border-red-100 hover:bg-red-50 no-underline rounded-full transition-all shadow-sm">
-                    Terminate Session
+                    Logout Account
                 </a>
             </div>
         </div>

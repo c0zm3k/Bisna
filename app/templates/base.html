@@ -58,14 +58,19 @@
 
                 <!-- Navigation Links -->
                 <div class="flex flex-wrap items-center justify-end gap-4 flex-grow">
+                    <!-- Global Search Bar -->
+                    <form action="{{ url_for('notes.list_notes') }}" method="GET" class="relative hidden lg:block mr-4">
+                        <input type="text" name="q" placeholder="Search notes, topics..."
+                            class="bg-gray-100/50 border-none rounded-full px-5 py-2 text-xs focus:ring-2 focus:ring-soft-primary/20 w-64 transition-all duration-300 placeholder:text-gray-400">
+                        <button type="submit"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-soft-primary">
+                            <i class="fas fa-search text-xs"></i>
+                        </button>
+                    </form>
+
                     {% if current_user.is_authenticated %}
                     <div class="flex items-center gap-2">
-                        {% if current_user.role.name == 'Super Admin' %}
-                        <a href="{{ url_for('super_admin.dashboard') }}"
-                            class="mat-button px-4 py-1.5 text-xs no-underline">
-                            Dashboard
-                        </a>
-                        {% elif current_user.role.name == 'Admin' %}
+                        {% if current_user.role.name == 'Admin' %}
                         <a href="{{ url_for('admin.dashboard') }}" class="mat-button px-4 py-1.5 text-xs no-underline">
                             Dashboard
                         </a>
@@ -73,8 +78,8 @@
                             class="mat-button px-4 py-1.5 text-xs no-underline">
                             Faculty
                         </a>
-                        {% elif current_user.role.name == 'Teacher' %}
-                        <a href="{{ url_for('main.teacher_dashboard') }}"
+                        {% elif current_user.role.name == 'Faculty' %}
+                        <a href="{{ url_for('main.faculty_dashboard') }}"
                             class="mat-button px-4 py-1.5 text-xs no-underline">
                             Portal
                         </a>

@@ -1,145 +1,74 @@
-# 🎓EduStack
+# 🎓Nilgiri College (NCAS)
 A modern, sleek College Management System built with **Flask** and **SQLAlchemy**, featuring a glassmorphism-inspired dark theme.
 
-Bisna streamlines college administration by providing distinct portals for students, teachers, and administrators. It features a robust Role-Based Access Control (RBAC) system to ensure secure interactions and syllabus-centric resource management.
+EduStack has been customized for **Nilgiri College**, providing a centralized portal for students, faculty, and administration.
 
 ## ✨ Key Features
 
 ### 🎨 User Interface
 - **Glassmorphism Design**: A premium, high-end aesthetic using blur and transparency effects.
-- **Mobile First**: Fully responsive layout optimized for all device sizes.
 - **Micro-interactions**: Smooth transitions and hover effects for an engaging experience.
 
 ### 🔐 Access Control
-- **Multi-Role Portals**: Dedicated experiences for Super Admin, College Admin, Teacher, and Student.
-- **Secure Sessions**: Powered by `Flask-Login` with encrypted password hashing.
+- **Streamlined Roles**: Dedicated experiences for Admin, Faculty, and Student.
+- **Institutional Focus**: All data is pre-seeded for Nilgiri College.
+- **Secure Sessions**: Powered by `Flask-Login` with RBAC enforcement for verification workflows.
 
-### 📚 Modules
-- **Syllabus Management**: Hierarchical structure from Courses down to individual Topics.
-- **Resource Distribution**: Teachers can upload study materials (PDF, DOCX, Video, or URLs).
-- **Verification Workflow**: Content can be reviewed and verified by teachers or admins before becoming public.
+### 📚 Academic Modules
+- **6 Core Courses**: Including B.Sc Computer Science, B.A. English, B.Com Finance, BBA Logistics, B.Sc Psychology, and BCA.
+- **Resource Distribution**: Faculty can upload study materials across courses.
+- **Verification Workflow**: Content must be reviewed and verified by staff before becoming public.
 
-## 🎨 Core Aesthetic
-
-EduStack utilizes a bespoke Neumorphic (Soft UI) design system, creating a tactile and immersive digital experience.
-
-| Landing Page | Login Page |
-| :---: | :---: |
-| ![Landing Page](app/static/img/screenshots/landing.png) | ![Login Page](app/static/img/screenshots/login.png) |
-
-| Super Admin Dashboard | Admin Dashboard |
-| :---: | :---: |
-| ![Super Admin Dashboard](app/static/img/screenshots/super_admin.png) | ![Admin Dashboard](app/static/img/screenshots/admin.png) |
-
-| Teacher Portal | Student Dashboard |
-| :---: | :---: |
-| ![Teacher Portal](app/static/img/screenshots/teacher.png) | ![Student Dashboard](app/static/img/screenshots/student.png) |
-
-## �🛠️ Tech Stack
-- **Backend**: Python, Flask, Jinja2
-- **Database**: SQLite (Dev), SQLAlchemy (ORM)
-- **Frontend**: Vanilla JavaScript, CSS3 (Modern Flexbox/Grid)
-- **File Delivery**: Cloudinary (CDN Support)
-
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
-- Python 3.8 or higher
-- pip (Python Package Installer)
+- Python 3.8+ & pip
 
-### Installation
+### Quick Setup
 
-1. **Clone the Repository**
+1. **Clone & Install**
    ```bash
    git clone https://github.com/c0zm3k/Bisna.git
    cd Bisna
-   ```
-
-2. **Set up Virtual Environment**
-   ```powershell
-   # Windows (PowerShell)
-   py -m venv .venv
-   .venv\Scripts\Activate.ps1
-   ```
-
-3. **Install Dependencies**
-   ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configuration (.env)**
-   Create a `.env` file in the root directory:
-   ```env
-   SECRET_KEY=dev-secret-key
-   DATABASE_URL=sqlite:///site.db
-   ```
-
-5. **Initialize Database & Seed Data**
+2. **Initialize Nilgiri Data**
    ```bash
    python bin/setup_db.py
-   python bin/seed_final_data.py
    ```
 
-6. **Institutional Credentials**
-   A complete, sorted list of access credentials for all roles and colleges is located in:
-   `login_credentials.txt`
-
-6. **Run the Application**
+3. **Run Application**
    ```bash
    python run.py
    ```
-   Visit `http://127.0.0.1:8000` in your browser.
+   Visit `http://127.0.0.1:8000`
 
 ## 👤 Test Credentials
 
-The system is pre-seeded with multiple demo accounts, now featuring **realistic full names** for a more immersive experience.
+The system is pre-seeded with specialized accounts for testing purposes.
 
-### 🌟 Super Admin
-| Email | Password | Access Level |
+### 🌟 Administrative Access
+| Role | Email | Password |
 | :--- | :--- | :--- |
-| `superadmin@example.com` | `admin123` | Full System Control, College Management |
+| **Admin** | `admin@ncas.edu` | `admin123` |
 
-## 🏢 College Directory
+### 🎓 Institutional Access Registry
+| Role | Email Pattern | Password | Count |
+| :--- | :--- | :--- | :--- |
+| **Faculty** | `faculty[1-10]@ncas.edu` | `password123` | 10 |
+| **Student** | `stud[1-20]@ncas.edu` | `password123` | 20 |
 
-The system is organized into multiple independent institutional nodes. Each college has a unique **College ID (CIDA)**.
-
-| College Name | College ID | Slug |
-| :--- | :--- | :--- |
-| **Oxford Technical University** | `CIDA001` | `oxfor` |
-| **Cambridge Science Academy** | `CIDA002` | `cambr` |
-| **Stanford Institute of Excellence** | `CIDA003` | `stanf` |
-| **MIT Global College** | `CIDA004` | `mitgl` |
-| **Ethoz Business School** | `CIDA005` | `ethoz` |
-| **Apex Engineering Institute** | `CIDA006` | `apexe` |
-
-## 👤 User Directory & Credentials
-
-The system is pre-seeded with **~666 total accounts** across all colleges, each with a designated **Full Name** (e.g., "Dr. Alan Turing").
-
-### 🌟 Global Access
-A complete list of credentials (Admin, Teacher, Student) for all colleges can be found in `login_credentials.txt`.
-
-### 🎓 Institutional Access (Per College)
-For any college listed above, use the following patterns (replace `[slug]` with the college slug):
-
-| Role | Email Pattern | Password |
-| :--- | :--- | :--- |
-| **Admin** | `admin@[slug].edu` | `password123` |
-| **Teacher** | `teacher[1-10]@[slug].edu` | `password123` |
-| **Student** | `student[teacher_idx]_[1-10]@[slug].edu` | `password123` |
-
-> [!TIP]
-> Each **Teacher** is seeded with **at least 3 resources** (PDFs, Docs, or URLs) associated with their specific college syllabus. Resource cards now display the teacher's full name.
+> [!NOTE]
+> All faculty accounts are pre-verified and associated with one of the 5 departmental courses. Students must use their `studX@ncas.edu` email and their registered number (e.g., `REG1001`) if re-registering.
 
 ## 📂 Project Structure
 ```text
-Bisna/
+EduStack/
 ├── app/               # Flask Application & Core Logic
-├── bin/               # Maintenance (setup_db, seed_final_data, clear_data)
+├── bin/               # Maintenance (setup_db, clear_data)
 ├── instance/          # Database & Local Storage
 ├── .env               # Environment configuration
-├── config.py          # Static settings
-├── login_credentials.txt # Institutional access registry
 ├── requirements.txt   # Dependencies
-└── run.py             # Entry sequence (Configured for Port 8000)
+└── run.py             # Entry sequence (Port 8000)
 ```

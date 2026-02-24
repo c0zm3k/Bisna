@@ -1,21 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Quick Overview Info -->
-<div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
-    <div>
-        <h2 class="text-xl font-bold text-soft-dark uppercase tracking-wider">
-            Welcome to <span class="text-soft-primary">Bisna</span>
-        </h2>
-    </div>
-    <div class="flex gap-4">
-        {% if current_user.is_authenticated %}
-        <div class="bg-white border border-gray-100 px-6 py-3 rounded-full flex items-center gap-3 shadow-sm">
-            <div class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
-            <span class="text-[0.7rem] font-bold text-gray-600 uppercase tracking-widest">{{ current_user.username
-                }}</span>
-        </div>
-        {% endif %}
+<!-- Hero Section -->
+<div class="py-20 text-center animate-fade-in">
+    <h2 class="text-5xl font-black text-soft-dark tracking-tighter mb-6">
+        Master Your <span class="text-gradient">Syllabus</span>
+    </h2>
+    <p class="text-gray-500 max-w-2xl mx-auto mb-12 font-medium">
+        The only academic platform where every note is verified and mapped directly to your course topics.
+    </p>
+
+    <!-- Prominent Search -->
+    <div class="max-w-3xl mx-auto mb-16 px-4">
+        <form action="{{ url_for('notes.list_notes') }}" method="GET" class="relative group">
+            <input type="text" name="q" placeholder="What are you studying today? (e.g. Calculus, Physics...)"
+                class="w-full bg-white border border-gray-100 rounded-2xl px-8 py-5 text-lg shadow-xl focus:ring-4 focus:ring-soft-primary/10 transition-all outline-none placeholder:text-gray-300">
+            <button type="submit"
+                class="absolute right-4 top-1/2 -translate-y-1/2 mat-button mat-button-primary rounded-xl px-8 h-12">
+                Search Notes
+            </button>
+        </form>
     </div>
 </div>
 
@@ -69,19 +73,6 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% if current_user.is_authenticated %}
-        {% if current_user.role.name == 'Super Admin' %}
-        <a href="{{ url_for('super_admin.dashboard') }}" class="mat-card p-8 group no-underline block hover:bg-gray-50">
-            <div class="flex justify-between items-start mb-6">
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 text-soft-primary">
-                    <i class="fas fa-user-shield text-lg"></i>
-                </div>
-                <i class="fas fa-chevron-right text-gray-300 group-hover:text-soft-primary transition-colors"></i>
-            </div>
-            <h4 class="text-lg font-bold text-soft-dark mb-2 uppercase tracking-tight">Super Admin</h4>
-            <p class="text-[0.75rem] font-medium text-gray-500 leading-relaxed">Control the whole system, manage
-                colleges, and see logs.</p>
-        </a>
-        {% endif %}
 
         {% if current_user.role.name == 'Admin' %}
         <a href="{{ url_for('admin.dashboard') }}" class="mat-card p-8 group no-underline block hover:bg-gray-50">
@@ -92,7 +83,7 @@
                 <i class="fas fa-chevron-right text-gray-300 group-hover:text-soft-primary transition-colors"></i>
             </div>
             <h4 class="text-lg font-bold text-soft-dark mb-2 uppercase tracking-tight">College Admin</h4>
-            <p class="text-[0.75rem] font-medium text-gray-500 leading-relaxed">Manage college settings, teachers, and
+            <p class="text-[0.75rem] font-medium text-gray-500 leading-relaxed">Manage college settings, faculty, and
                 student details.</p>
         </a>
         {% endif %}

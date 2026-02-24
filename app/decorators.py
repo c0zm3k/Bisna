@@ -13,8 +13,8 @@ def role_required(*role_names):
             if current_user.role.name not in role_names:
                 abort(403)
             
-            # Enforce verification (Super Admin is inherently verified/exempt)
-            if current_user.role.name != 'Super Admin' and not current_user.is_verified:
+            # Enforce verification
+            if not current_user.is_verified:
                 abort(403, description="Your account is pending verification.")
                 
             return f(*args, **kwargs)

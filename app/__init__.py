@@ -29,14 +29,12 @@ def create_app(config_class=Config):
     from app.routes.admin import admin
     from app.routes.notes import notes
     from app.routes.api import api
-    from app.routes.super_admin import super_admin
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(admin)
     app.register_blueprint(notes)
     app.register_blueprint(api)
-    app.register_blueprint(super_admin)
 
     # Activity Tracking Middleware
     from datetime import datetime

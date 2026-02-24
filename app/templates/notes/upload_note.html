@@ -5,10 +5,10 @@
     <div class="w-full max-w-3xl">
         <div class="mat-card p-8 md:p-12 border-none shadow-xl">
             <div class="mb-10 text-center">
-                <h2 class="text-3xl font-black text-soft-dark tracking-tight mb-2">Resource <span
-                        class="text-soft-primary">Upload</span></h2>
-                <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest">Contribute to the academic
-                    ecosystem</p>
+                <h2 class="text-3xl font-black text-soft-dark tracking-tight mb-2">Post <span
+                        class="text-soft-primary">New Note</span></h2>
+                <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest">Share notes with your
+                    students</p>
             </div>
 
             <form method="POST" action="" enctype="multipart/form-data" id="uploadForm">
@@ -21,10 +21,9 @@
                             <i class="fas fa-sitemap text-sm"></i>
                         </div>
                         <div>
-                            <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">Where does this
-                                belong?</h5>
-                            <p class="text-[0.6rem] font-medium text-gray-400 uppercase tracking-widest">Pick the course
-                                and subject</p>
+                            <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">Course Details</h5>
+                            <p class="text-[0.6rem] font-medium text-gray-400 uppercase tracking-widest">Select the
+                                class and topic</p>
                         </div>
                     </div>
 
@@ -33,7 +32,7 @@
                             <label
                                 class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider ml-1">Course</label>
                             <select class="mat-input h-11 text-sm bg-white cursor-pointer" id="courseSelect">
-                                <option value="">Select Course...</option>
+                                <option value="">Choose Course...</option>
                             </select>
                         </div>
                         <div class="flex flex-col gap-2">
@@ -41,7 +40,7 @@
                                 class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider ml-1">Semester</label>
                             <select class="mat-input h-11 text-sm bg-white cursor-pointer opacity-50"
                                 id="semesterSelect" disabled>
-                                <option value="">Select Semester...</option>
+                                <option value="">Choose Semester...</option>
                             </select>
                         </div>
                         <div class="flex flex-col gap-2">
@@ -49,7 +48,7 @@
                                 class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider ml-1">Subject</label>
                             <select class="mat-input h-11 text-sm bg-white cursor-pointer opacity-50" id="subjectSelect"
                                 disabled>
-                                <option value="">Select Subject...</option>
+                                <option value="">Choose Subject...</option>
                             </select>
                         </div>
                     </div>
@@ -74,8 +73,8 @@
                 <!-- Content Configuration -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                     <div class="md:col-span-3 flex flex-col gap-2">
-                        <label class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider ml-1">Material
-                            Title</label>
+                        <label
+                            class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider ml-1">Title</label>
                         {{ form.title(class="mat-input h-11 text-sm", placeholder="e.g., Advanced Calculus Notes") }}
                         {% if form.title.errors %}
                         {% for error in form.title.errors %}<div class="text-red-500 text-[0.6rem] font-bold mt-1 ml-1">
@@ -102,7 +101,7 @@
                                 class="w-16 h-16 mx-auto flex items-center justify-center mb-6 rounded-2xl bg-white shadow-sm text-soft-primary">
                                 <i class="fas fa-cloud-upload-alt text-2xl"></i>
                             </div>
-                            <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wide">Drag & Drop Material
+                            <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wide">Drag & Drop Note
                             </h5>
                             <p class="text-[0.6rem] text-gray-400 font-bold uppercase tracking-widest mt-2">PDF, DOCX,
                                 PPT (Max 100MB)</p>
@@ -137,9 +136,9 @@
                 </div>
 
                 <div class="text-center mt-10">
-                    <a href="{{ url_for('main.teacher_dashboard') }}"
+                    <a href="{{ url_for('main.faculty_dashboard') }}"
                         class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest hover:text-soft-primary transition-colors no-underline">
-                        <i class="fas fa-arrow-left mr-2"></i> Return to Portal
+                        <i class="fas fa-arrow-left mr-2"></i> Go Back
                     </a>
                 </div>
             </form>

@@ -16,7 +16,7 @@
                 <span class="text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest">{{ notes|length }}
                     Files</span>
             </div>
-            {% if current_user.is_authenticated and current_user.role.name in ['Teacher', 'Admin'] %}
+            {% if current_user.is_authenticated and current_user.role.name in ['Faculty', 'Admin'] %}
             <a href="{{ url_for('notes.upload_note') }}"
                 class="mat-button mat-button-primary px-4 py-2 no-underline text-[0.7rem] rounded-full shadow-md">
                 <i class="fas fa-plus me-1 text-[0.6rem]"></i> Upload New
@@ -39,7 +39,7 @@
             </div>
 
             <!-- Filters -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="flex flex-col gap-2">
                     <label class="text-[0.65rem] font-bold text-soft-dark uppercase tracking-wider ml-1">Course</label>
                     <select name="course_id" class="mat-input h-11 text-sm cursor-pointer"
@@ -74,6 +74,19 @@
                         {% endfor %}
                     </select>
                 </div>
+                <!-- Faculty Filter -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[0.65rem] font-bold text-soft-dark uppercase tracking-wider ml-1">Faculty</label>
+                    <select name="uploader_id" class="mat-input h-11 text-sm cursor-pointer"
+                        onchange="this.form.submit()">
+                        <option value="">All Faculty</option>
+                        {% for uploader in uploaders %}
+                        <option value="{{ uploader.id }}" {% if selected_uploader==uploader.id %}selected{% endif %}>
+                            {{ uploader.name or uploader.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="flex items-end">
                     <a href="{{ url_for('notes.list_notes') }}"
                         class="mat-button mat-button-outline w-full h-11 text-red-600 border-red-200 hover:bg-red-50 no-underline text-xs">
@@ -84,11 +97,11 @@
         </div>
     </form>
 
-    <!-- Knowledge Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {% if notes %}
         {% for note in notes %}
-        <div class="mat-card p-6 flex flex-col hover:border-soft-primary transition-all duration-300">
+        <div class="mat-card p-6 flex flex-col hover-lift animate-fade-in"
+            style="animation-delay: {{ loop.index0 * 0.1 }}s">
             <div class="flex justify-between items-start mb-4">
                 <div
                     class="bg-soft-bg text-soft-dark px-3 py-1 rounded-full text-[0.6rem] font-bold uppercase tracking-wider truncate max-w-[160px]">
@@ -102,7 +115,14 @@
                 </div>
             </div>
 
-            <h3 class="text-base font-bold text-soft-dark mb-1 leading-snug">{{ note.title }}</h3>
+            <div class="flex items-center gap-2 mb-2">
+                <h3 class="text-base font-bold text-soft-dark leading-snug">{{ note.title }}</h3>
+                {% if note.is_verified %}
+                <span class="badge-verified" title="Verified by Faculty">
+                    <i class="fas fa-check-circle text-[0.6rem]"></i> Verified
+                </span>
+                {% endif %}
+            </div>
             <p class="text-[0.65rem] font-medium text-gray-500 uppercase mb-4">By {{ note.uploader.name or
                 note.uploader.username }}
             </p>
@@ -136,7 +156,7 @@
                     <i class="fas fa-download"></i>
                 </a>
                 {% endif %}
-                {% if current_user.is_authenticated and (current_user.role.name in ['Teacher', 'Admin'] or
+                {% if current_user.is_authenticated and (current_user.role.name in ['Faculty', 'Admin'] or
                 current_user.id == note.user_id) %}
                 <a href="{{ url_for('notes.edit_note', note_id=note.id) }}"
                     class="mat-button mat-button-outline w-11 flex items-center justify-center text-gray-400"

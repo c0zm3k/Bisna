@@ -10,7 +10,7 @@ def load_user(user_id):
 # --- Auth Models ---
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), unique=True, nullable=False) # Admin, Teacher, Senior, Student
+    name = db.Column(db.String(20), unique=True, nullable=False) # Admin, Faculty, Student
     users = db.relationship('User', backref='role', lazy=True)
 
     def __repr__(self):
@@ -46,7 +46,7 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False)
     
     # New Fields
-    college_id = db.Column(db.Integer, db.ForeignKey('college.id'), nullable=True) # Null for Super Admin
+    college_id = db.Column(db.Integer, db.ForeignKey('college.id'), nullable=True)
     register_number = db.Column(db.String(50), nullable=True) # For Students
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
@@ -116,6 +116,8 @@ class Note(db.Model):
     upload_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
     verification_status = db.relationship('VerificationStatus', uselist=False, backref='note', lazy=True)
+
+    __table_args__ = (db.UniqueConstraint('title', 'topic_id', 'college_id', name='_note_topic_title_uc'),)
 
 class VerificationStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True)

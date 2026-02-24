@@ -1,7 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, make_response
 from flask_login import login_required, current_user
 from app import db
-from app.models import Course, Semester, Subject, Unit, Topic, Role, StudentRegistry, User
+from app.models import Course, Semester, Subject, Unit, Topic, Role, StudentRegistry, User, College
 from app.forms import CourseForm, SemesterForm, SubjectForm, UnitForm, TopicForm, CSVUploadForm
 from app.decorators import admin_required, role_required
 from app.utils import log_activity
@@ -15,118 +15,111 @@ admin = Blueprint('admin', __name__)
 @login_required
 @admin_required
 def dashboard():
-    courses = Course.query.filter_by(college_id=current_user.college_id).all()
+    courses = Course.query.all()
     
-    # Fetch pending teachers for THIS college
-    pending_teachers = User.query.join(Role).filter(
+    # Fetch pending facultys for THIS college
+    pending_facultys = User.query.join(Role).filter(
         User.is_verified == False,
-        Role.name == 'Teacher',
-        User.college_id == current_user.college_id
+        Role.name == 'Faculty'
     ).all()
 
-    verified_teachers = User.query.join(Role).filter(
+    verified_facultys = User.query.join(Role).filter(
         User.is_verified == True,
-        Role.name == 'Teacher',
-        User.college_id == current_user.college_id
+        Role.name == 'Faculty'
     ).all()
 
-    # Fetch verified students for THIS college
+    # Fetch verified students
     verified_students = User.query.join(Role).filter(
         User.is_verified == True,
-        Role.name == 'Student',
-        User.college_id == current_user.college_id
+        Role.name == 'Student'
     ).all()
     
     return render_template('admin/dashboard.html', 
                            courses=courses, 
-                           pending_teachers=pending_teachers,
-                           verified_teachers=verified_teachers,
+                           pending_facultys=pending_facultys,
+                           verified_facultys=verified_facultys,
                            verified_students=verified_students)
 
 @admin.route('/admin/faculty')
 @login_required
 @role_required('Admin')
 def view_faculty():
-    verified_teachers = User.query.join(Role).filter(
+    verified_facultys = User.query.join(Role).filter(
         User.is_verified == True,
-        Role.name == 'Teacher',
-        User.college_id == current_user.college_id
+        Role.name == 'Faculty'
     ).all()
-    return render_template('admin/faculty.html', verified_teachers=verified_teachers)
+    return render_template('admin/faculty.html', verified_facultys=verified_facultys)
 
 @admin.route('/admin/students')
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def view_students():
     verified_students = User.query.join(Role).filter(
         User.is_verified == True,
-        Role.name == 'Student',
-        User.college_id == current_user.college_id
+        Role.name == 'Student'
     ).all()
     
-    # Contextual title/back link for Admin vs Teacher
+    # Contextual title/back link for Admin vs Faculty
     return render_template('admin/students.html', verified_students=verified_students)
 
-@admin.route('/admin/verify_teacher/<int:user_id>/<action>')
+@admin.route('/admin/verify_faculty/<int:user_id>/<action>')
 @login_required
 @role_required('Admin')
-def verify_teacher(user_id, action):
+def verify_faculty(user_id, action):
     user = User.query.get_or_404(user_id)
     
-    # Security check: Ensure teacher belongs to admin's college
-    if user.college_id != current_user.college_id:
-        flash('Unauthorized access.', 'danger')
-        return redirect(url_for('admin.dashboard'))
+    # Security check: Single college setup - all belong to same college
+    pass
         
     if action == 'approve':
         user.is_verified = True
-        log_activity('Verify Teacher', f'Approved teacher {user.username}')
-        flash(f'Teacher {user.username} approved.', 'success')
+        log_activity('Verify Faculty', f'Approved faculty {user.username}')
+        flash(f'Faculty {user.username} approved.', 'success')
     elif action == 'reject':
         username = user.username
-        log_activity('Verify Teacher', f'Rejected teacher {username}')
+        log_activity('Verify Faculty', f'Rejected faculty {username}')
         db.session.delete(user)
-        flash(f'Teacher {username} rejected.', 'danger')
+        flash(f'Faculty {username} rejected.', 'danger')
     
     db.session.commit()
     return redirect(url_for('admin.dashboard'))
 
-@admin.route('/admin/delete_teacher/<int:user_id>', methods=['POST'])
+@admin.route('/admin/delete_faculty/<int:user_id>', methods=['POST'])
 @login_required
 @role_required('Admin')
-def delete_teacher(user_id):
+def delete_faculty(user_id):
     user = User.query.get_or_404(user_id)
     
-    if user.college_id != current_user.college_id or user.role.name != 'Teacher':
+    if user.role.name != 'Faculty':
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('admin.dashboard'))
     
     username = user.username
-    log_activity('Delete Teacher', f'Deleted teacher {username}')
+    log_activity('Delete Faculty', f'Deleted faculty {username}')
     db.session.delete(user)
     db.session.commit()
-    flash(f'Teacher {username} deleted.', 'success')
+    flash(f'Faculty {username} deleted.', 'success')
     return redirect(url_for('admin.dashboard'))
 
 @admin.route('/admin/logs')
 @login_required
 @role_required('Admin')
 def view_logs():
-    # Filter logs for 'Teacher' role users in THIS college
+    # Filter logs for 'Faculty' role users in THIS college
     from app.models import ActivityLog
     logs = ActivityLog.query.join(User).join(Role).filter(
-        Role.name == 'Teacher',
-        User.college_id == current_user.college_id
+        Role.name == 'Faculty'
     ).order_by(ActivityLog.timestamp.desc()).all()
-    return render_template('admin/logs.html', logs=logs, title='Teacher Activity Logs')
+    return render_template('admin/logs.html', logs=logs, title='Faculty Activity Logs')
 
 @admin.route('/admin/manage/course', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def manage_course():
     form = CourseForm()
     if form.validate_on_submit():
-        course = Course(name=form.name.data, college_id=current_user.college_id)
+        primary_college = College.query.first()
+        course = Course(name=form.name.data, college_id=primary_college.id)
         db.session.add(course)
         db.session.commit()
         log_activity('Add Course', f'Added course {course.name}')
@@ -138,10 +131,13 @@ def manage_course():
 
 @admin.route('/admin/manage/semester', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def manage_semester():
     form = SemesterForm()
-    form.course.choices = [(c.id, c.name) for c in Course.query.filter_by(college_id=current_user.college_id).all()]
+    form.course.choices = [(c.id, c.name) for c in Course.query.all()]
+    if request.method == 'GET' and request.args.get('course'):
+        form.course.data = int(request.args.get('course'))
+    
     if form.validate_on_submit():
         semester = Semester(number=form.number.data, course_id=form.course.data)
         db.session.add(semester)
@@ -155,11 +151,14 @@ def manage_semester():
 
 @admin.route('/admin/manage/subject', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def manage_subject():
     form = SubjectForm()
     # Chain selection: only semesters belonging to courses in this college
-    form.semester.choices = [(s.id, f"{s.course.name} - Semester {s.number}") for s in Semester.query.join(Course).filter(Course.college_id == current_user.college_id).all()]
+    form.semester.choices = [(s.id, f"{s.course.name} - Semester {s.number}") for s in Semester.query.all()]
+    if request.method == 'GET' and request.args.get('semester'):
+        form.semester.data = int(request.args.get('semester'))
+
     if form.validate_on_submit():
         subject = Subject(name=form.name.data, semester_id=form.semester.data)
         db.session.add(subject)
@@ -175,7 +174,7 @@ def manage_subject():
 
 @admin.route('/admin/edit/course/<int:course_id>', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def edit_course(course_id):
     course = Course.query.get_or_404(course_id)
     form = CourseForm(obj=course)
@@ -189,7 +188,7 @@ def edit_course(course_id):
 
 @admin.route('/admin/delete/course/<int:course_id>', methods=['POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def delete_course(course_id):
     course = Course.query.get_or_404(course_id)
     course_name = course.name
@@ -201,14 +200,13 @@ def delete_course(course_id):
 
 @admin.route('/admin/edit/semester/<int:sem_id>', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def edit_semester(sem_id):
     sem = Semester.query.get_or_404(sem_id)
-    if sem.course.college_id != current_user.college_id:
-        flash('Unauthorized access.', 'danger')
-        return redirect(url_for('admin.dashboard'))
+    # Security check: Single college setup - all belong to same college
+    pass
     form = SemesterForm(obj=sem)
-    form.course.choices = [(c.id, c.name) for c in Course.query.filter_by(college_id=current_user.college_id).all()]
+    form.course.choices = [(c.id, c.name) for c in Course.query.all()]
     if form.validate_on_submit():
         sem.number = form.number.data
         sem.course_id = form.course.data
@@ -221,7 +219,7 @@ def edit_semester(sem_id):
 
 @admin.route('/admin/delete/semester/<int:sem_id>', methods=['POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def delete_semester(sem_id):
     sem = Semester.query.get_or_404(sem_id)
     sem_num = sem.number
@@ -234,14 +232,13 @@ def delete_semester(sem_id):
 
 @admin.route('/admin/edit/subject/<int:sub_id>', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def edit_subject(sub_id):
     sub = Subject.query.get_or_404(sub_id)
-    if sub.semester.course.college_id != current_user.college_id:
-        flash('Unauthorized access.', 'danger')
-        return redirect(url_for('admin.dashboard'))
+    # Security check: Single college setup 
+    pass
     form = SubjectForm(obj=sub)
-    form.semester.choices = [(s.id, f"{s.course.name} - Semester {s.number}") for s in Semester.query.join(Course).filter(Course.college_id == current_user.college_id).all()]
+    form.semester.choices = [(s.id, f"{s.course.name} - Semester {s.number}") for s in Semester.query.all()]
     if form.validate_on_submit():
         sub.name = form.name.data
         sub.semester_id = form.semester.data
@@ -254,7 +251,7 @@ def edit_subject(sub_id):
 
 @admin.route('/admin/delete/subject/<int:sub_id>', methods=['POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def delete_subject(sub_id):
     sub = Subject.query.get_or_404(sub_id)
     sub_name = sub.name
@@ -266,10 +263,10 @@ def delete_subject(sub_id):
 
 @admin.route('/admin/manage/unit', methods=['GET', 'POST'])
 @login_required
-@role_required('Teacher')
+@role_required('Faculty')
 def manage_unit():
     form = UnitForm()
-    form.subject.choices = [(s.id, s.name) for s in Subject.query.join(Semester).join(Course).filter(Course.college_id == current_user.college_id).all()]
+    form.subject.choices = [(s.id, s.name) for s in Subject.query.all()]
     if form.validate_on_submit():
         unit = Unit(number=form.number.data, subject_id=form.subject.data)
         db.session.add(unit)
@@ -279,18 +276,18 @@ def manage_unit():
         if request.args.get('next'):
             return redirect(request.args.get('next'))
         
-        # Determine redirect based on role (though strictly restricted to Teacher now)
-        if current_user.role.name == 'Teacher':
-             return redirect(url_for('main.teacher_dashboard'))
+        # Determine redirect based on role (though strictly restricted to Faculty now)
+        if current_user.role.name == 'Faculty':
+             return redirect(url_for('main.faculty_dashboard'))
         return redirect(url_for('admin.dashboard'))
     return render_template('admin/manage_syllabus.html', form=form, title='Add Unit')
 
 @admin.route('/admin/manage/topic', methods=['GET', 'POST'])
 @login_required
-@role_required('Teacher')
+@role_required('Faculty')
 def manage_topic():
     form = TopicForm()
-    form.unit.choices = [(u.id, f"{u.subject.name} - Unit {u.number}") for u in Unit.query.join(Subject).join(Semester).join(Course).filter(Course.college_id == current_user.college_id).all()]
+    form.unit.choices = [(u.id, f"{u.subject.name} - Unit {u.number}") for u in Unit.query.all()]
     if form.validate_on_submit():
         topic = Topic(name=form.name.data, unit_id=form.unit.data)
         db.session.add(topic)
@@ -300,21 +297,20 @@ def manage_topic():
         if request.args.get('next'):
             return redirect(request.args.get('next'))
             
-        if current_user.role.name == 'Teacher':
-             return redirect(url_for('main.teacher_dashboard'))
+        if current_user.role.name == 'Faculty':
+             return redirect(url_for('main.faculty_dashboard'))
         return redirect(url_for('admin.dashboard'))
     return render_template('admin/manage_syllabus.html', form=form, title='Add Topic')
 
 @admin.route('/admin/edit/unit/<int:unit_id>', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def edit_unit(unit_id):
     unit = Unit.query.get_or_404(unit_id)
-    if unit.subject.semester.course.college_id != current_user.college_id:
-        flash('Unauthorized access.', 'danger')
-        return redirect(url_for('admin.dashboard'))
+    # Security check: Single college setup
+    pass
     form = UnitForm(obj=unit)
-    form.subject.choices = [(s.id, s.name) for s in Subject.query.join(Semester).join(Course).filter(Course.college_id == current_user.college_id).all()]
+    form.subject.choices = [(s.id, s.name) for s in Subject.query.all()]
     if form.validate_on_submit():
         unit.number = form.number.data
         unit.subject_id = form.subject.data
@@ -327,7 +323,7 @@ def edit_unit(unit_id):
 
 @admin.route('/admin/delete/unit/<int:unit_id>', methods=['POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def delete_unit(unit_id):
     unit = Unit.query.get_or_404(unit_id)
     unit_num = unit.number
@@ -340,14 +336,13 @@ def delete_unit(unit_id):
 
 @admin.route('/admin/edit/topic/<int:topic_id>', methods=['GET', 'POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def edit_topic(topic_id):
     topic = Topic.query.get_or_404(topic_id)
-    if topic.unit.subject.semester.course.college_id != current_user.college_id:
-        flash('Unauthorized access.', 'danger')
-        return redirect(url_for('admin.dashboard'))
+    # Security check: Single college setup
+    pass
     form = TopicForm(obj=topic)
-    form.unit.choices = [(u.id, f"{u.subject.name} - Unit {u.number}") for u in Unit.query.join(Subject).join(Semester).join(Course).filter(Course.college_id == current_user.college_id).all()]
+    form.unit.choices = [(u.id, f"{u.subject.name} - Unit {u.number}") for u in Unit.query.all()]
     if form.validate_on_submit():
         topic.name = form.name.data
         topic.unit_id = form.unit.data
@@ -360,7 +355,7 @@ def edit_topic(topic_id):
 
 @admin.route('/admin/delete/topic/<int:topic_id>', methods=['POST'])
 @login_required
-@role_required('Admin', 'Teacher')
+@role_required('Admin', 'Faculty')
 def delete_topic(topic_id):
     topic = Topic.query.get_or_404(topic_id)
     topic_name = topic.name
@@ -394,15 +389,15 @@ def upload_student_data():
                 flash('File must contain "Register Number" and "Email" columns.', 'danger')
                 return redirect(url_for('admin.upload_student_data'))
             
-            count = 0
+            primary_college = College.query.first()
             for index, row in df.iterrows():
-                reg_num = str(row['Register Number']).strip()
-                email = str(row['Email']).strip()
+                reg_num = str(row['Register Number']).strip().upper()
+                email = str(row['Email']).strip().lower()
                 
-                # Check for duplications in this college
-                exists = StudentRegistry.query.filter_by(register_number=reg_num, college_id=current_user.college_id).first()
+                # Check for duplications
+                exists = StudentRegistry.query.filter_by(register_number=reg_num, college_id=primary_college.id).first()
                 if not exists:
-                    registry = StudentRegistry(register_number=reg_num, email=email, college_id=current_user.college_id)
+                    registry = StudentRegistry(register_number=reg_num, email=email, college_id=primary_college.id)
                     db.session.add(registry)
                     count += 1
             
@@ -417,6 +412,31 @@ def upload_student_data():
 
     return render_template('admin/upload_registry.html', form=form)
 
+@admin.route('/admin/add_student_registry', methods=['GET', 'POST'])
+@login_required
+@role_required('Admin')
+def add_student_registry():
+    from app.forms import SingleRegistryForm
+    form = SingleRegistryForm()
+    if form.validate_on_submit():
+        reg_num = form.register_number.data.strip().upper()
+        email = form.email.data.strip().lower()
+        primary_college = College.query.first()
+        
+        # Duplication check
+        exists = StudentRegistry.query.filter_by(register_number=reg_num, college_id=primary_college.id).first()
+        if exists:
+            flash(f'Student with Register Number {reg_num} already exists in registry.', 'warning')
+        else:
+            registry = StudentRegistry(register_number=reg_num, email=email, college_id=primary_college.id)
+            db.session.add(registry)
+            db.session.commit()
+            log_activity('Add Registry Entry', f'Manually added {email} / {reg_num} to registry.')
+            flash('Student added to authorized registry!', 'success')
+            return redirect(url_for('admin.dashboard'))
+            
+    return render_template('admin/manage_syllabus.html', form=form, title='Add Student to Registry')
+
 @admin.route('/admin/report/<int:user_id>')
 @login_required
 @role_required('Admin')
@@ -426,8 +446,8 @@ def user_report(user_id):
     from app.models import ActivityLog
     
     user = User.query.get_or_404(user_id)
-    # Security: Admin can only see reports of teachers in their college
-    if user.college_id != current_user.college_id or user.role.name != 'Teacher':
+    # Security: Admin can only see reports of facultys
+    if user.role.name != 'Faculty':
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('admin.dashboard'))
     
@@ -451,7 +471,7 @@ def user_report(user_id):
     response.headers['Content-Disposition'] = f'attachment; filename=activity_report_{user.username}.csv'
     response.headers['Content-Type'] = 'text/csv'
     
-    log_activity('Generate Report', f'Generated activity report for teacher {user.username}')
+    log_activity('Generate Report', f'Generated activity report for faculty {user.username}')
     return response
 
 @admin.route('/admin/download_logs/<role_name>')
@@ -462,13 +482,12 @@ def download_logs(role_name):
     import csv
     from app.models import ActivityLog
     
-    if role_name not in ['Teacher', 'Student']:
+    if role_name not in ['Faculty', 'Student']:
         flash('Invalid role specified.', 'danger')
         return redirect(url_for('admin.dashboard'))
         
     logs = ActivityLog.query.join(User).join(Role).filter(
-        Role.name == role_name,
-        User.college_id == current_user.college_id
+        Role.name == role_name
     ).order_by(ActivityLog.timestamp.desc()).all()
     
     output = io.StringIO()

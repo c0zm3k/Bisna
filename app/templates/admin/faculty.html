@@ -18,17 +18,17 @@
             </div>
         </div>
         <div class="nm-flat px-4 py-2 rounded-full flex items-center gap-2">
-            <i class="fas fa-chalkboard-teacher text-soft-primary text-[0.6rem]"></i>
+            <i class="fas fa-chalkboard-user text-soft-primary text-[0.6rem]"></i>
             <span class="text-[0.55rem] font-black text-soft-primary uppercase tracking-widest">{{
-                verified_teachers|length }} Entities Sync</span>
+                verified_facultys|length }} Entities Sync</span>
         </div>
     </div>
 
     <!-- Registry Grid -->
     <div class="nm-flat p-6">
-        {% if verified_teachers %}
+        {% if verified_facultys %}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {% for teacher in verified_teachers %}
+            {% for faculty in verified_facultys %}
             <div class="nm-inset p-4 group">
                 <div class="flex items-start justify-between mb-3">
                     <div
@@ -37,11 +37,11 @@
                     </div>
                     {% if current_user.role.name == 'Admin' %}
                     <div class="flex gap-1.5">
-                        <a href="{{ url_for('admin.user_report', user_id=teacher.id) }}"
+                        <a href="{{ url_for('admin.user_report', user_id=faculty.id) }}"
                             class="nm-button w-7 h-7 flex items-center justify-center text-[0.5rem]" title="Audit">
                             <i class="fas fa-file-export"></i>
                         </a>
-                        <form action="{{ url_for('admin.delete_teacher', user_id=teacher.id) }}" method="POST"
+                        <form action="{{ url_for('admin.delete_faculty', user_id=faculty.id) }}" method="POST"
                             onsubmit="return confirm('Archive entity?');">
                             <button type="submit"
                                 class="nm-button w-7 h-7 flex items-center justify-center text-red-500/60 text-[0.5rem]"
@@ -53,13 +53,13 @@
                     {% endif %}
                 </div>
                 <h4 class="text-[0.7rem] font-black text-soft-dark truncate mb-0.5 uppercase tracking-tight">{{
-                    teacher.name or teacher.username }}</h4>
+                    faculty.name or faculty.username }}</h4>
                 <p class="text-[0.5rem] text-soft-primary font-bold opacity-40 uppercase tracking-widest truncate">{{
-                    teacher.email }}</p>
+                    faculty.email }}</p>
                 <div
                     class="mt-3 pt-3 border-t border-soft-primary/5 flex justify-between items-center text-[0.45rem] font-black uppercase tracking-widest text-soft-primary/30">
                     <span>ID NODE</span>
-                    <span>#{{ teacher.id + 2020 }}</span>
+                    <span>#{{ faculty.id + 2020 }}</span>
                 </div>
             </div>
             {% endfor %}

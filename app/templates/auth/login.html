@@ -26,12 +26,6 @@
                             Type</label>
                         {{ form.role(class="mat-input h-11 text-sm cursor-pointer", id="role") }}
                     </div>
-                    <div id="college_id_div">
-                        <label
-                            class="block text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">College
-                            ID</label>
-                        {{ form.college_id(class="mat-input h-11 text-sm", placeholder="CIDA001") }}
-                    </div>
                 </div>
 
                 <div class="mb-6">
@@ -64,21 +58,4 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const roleSelect = document.getElementById('role');
-        const collegeIdDiv = document.getElementById('college_id_div');
-
-        function toggleCollegeId() {
-            if (roleSelect.value === 'Super Admin') {
-                collegeIdDiv.style.display = 'none';
-            } else {
-                collegeIdDiv.style.display = 'block';
-            }
-        }
-
-        roleSelect.addEventListener('change', toggleCollegeId);
-        toggleCollegeId();
-    });
-</script>
 {% endblock %}

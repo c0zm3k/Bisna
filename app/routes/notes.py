@@ -51,11 +51,11 @@ def save_file_to_cdn(form_file, material_type):
 
 @notes.route('/notes/upload', methods=['GET', 'POST'])
 @login_required
-@role_required('Teacher', 'Senior Student', 'Admin')
+@role_required('Faculty', 'Admin')
 def upload_note():
     form = NoteUploadForm()
     # Populate topics with full context, filtered by college
-    topics = Topic.query.join(Unit).join(Subject).join(Semester).join(Course).filter(Course.college_id == current_user.college_id).all()
+    topics = Topic.query.join(Unit).join(Subject).join(Semester).join(Course).all()
     form.topic.choices = [(t.id, f"{t.unit.subject.semester.course.name} - Sem {t.unit.subject.semester.number} - {t.unit.subject.name} - Unit {t.unit.number} - {t.name}") for t in topics]
 
     if form.validate_on_submit():
@@ -83,10 +83,14 @@ def upload_note():
                 filename = save_file(form.file.data)
                 flash('CDN upload unavailable. Saved locally.', 'warning')
 
-        # Duplicate Detection
-        existing_note = Note.query.filter_by(title=form.title.data, topic_id=form.topic.data).first()
+        # Robust Duplicate Detection: Check (title, topic_id, college_id)
+        existing_note = Note.query.filter_by(
+            title=form.title.data, 
+            topic_id=form.topic.data
+        ).first()
+
         if existing_note:
-            flash(f'A study material with title "{form.title.data}" already exists for this topic.', 'warning')
+            flash(f'Duplicate detected! A study material with title "{form.title.data}" already exists for this syllabus topic.', 'warning')
             return redirect(url_for('notes.upload_note'))
         
         note = Note(
@@ -95,7 +99,7 @@ def upload_note():
             file_url=file_url,
             material_type=material_type,
             user_id=current_user.id, 
-            topic_id=form.topic.data, 
+            topic_id=form.topic.data,
             college_id=current_user.college_id
         )
         db.session.add(note)
@@ -118,6 +122,7 @@ def list_notes():
     course_id = request.args.get('course_id', type=int)
     semester_num = request.args.get('semester_num', type=int)
     subject_id = request.args.get('subject_id', type=int)
+    uploader_id = request.args.get('uploader_id', type=int)
     search_query = request.args.get('q', '')
     
     # Base query for verified notes
@@ -125,12 +130,18 @@ def list_notes():
     notes_query = Note.query.filter_by(is_verified=True).join(Topic).join(Unit).join(Subject).join(Semester)
     
     # Apply independent filters
+    course_query = Course.query
+    subject_query = Subject.query
+    semester_num_query = db.session.query(Semester.number).distinct()
+
     if course_id:
         notes_query = notes_query.filter(Semester.course_id == course_id)
     if semester_num:
         notes_query = notes_query.filter(Semester.number == semester_num)
     if subject_id:
         notes_query = notes_query.filter(Subject.id == subject_id)
+    if uploader_id:
+        notes_query = notes_query.filter(Note.user_id == uploader_id)
     if search_query:
         search_filter = f"%{search_query}%"
         from sqlalchemy import or_
@@ -143,45 +154,43 @@ def list_notes():
         ))
     
     # Strict college isolation for authenticated users
-    if current_user.is_authenticated and current_user.college_id:
-        notes_query = notes_query.filter(Note.college_id == current_user.college_id)
+    # No college filter needed in single college setup
+    pass
     
     notes = notes_query.order_by(Note.upload_date.desc()).all()
     
-    # Fetch data for filter dropdowns (restricted by college)
-    course_query = Course.query
-    subject_query = Subject.query.join(Semester).join(Course)
-    semester_num_query = db.session.query(Semester.number).distinct().join(Course)
-    
-    if current_user.is_authenticated and current_user.college_id:
-        course_query = course_query.filter_by(college_id=current_user.college_id)
-        subject_query = subject_query.filter(Course.college_id == current_user.college_id)
-        semester_num_query = semester_num_query.filter(Course.college_id == current_user.college_id)
-    
+    # Fetch all data in single college setup
     courses = course_query.all()
     subjects = subject_query.all()
     semester_nums = [n[0] for n in semester_num_query.order_by(Semester.number).all()]
+    
+    # Fetch uploaders for filter
+    from app.models import User
+    uploaders = User.query.join(Note, User.id == Note.user_id).distinct().all()
     
     return render_template('notes/list_notes.html', 
                            notes=notes, 
                            courses=courses, 
                            semester_nums=semester_nums, 
                            subjects=subjects,
+                           uploaders=uploaders,
                            selected_course=course_id,
                            selected_semester_num=semester_num,
                            selected_subject=subject_id,
+                           selected_uploader=uploader_id,
                            search_query=search_query)
 
 @notes.route('/notes/verify')
 @login_required
-@role_required('Teacher', 'Admin')
+@role_required('Faculty', 'Admin')
 def verification_queue():
+    # Only show notes for the same college
     pending_notes = Note.query.filter_by(is_verified=False).all()
     return render_template('notes/verification_queue.html', notes=pending_notes)
 
 @notes.route('/notes/approve/<int:note_id>')
 @login_required
-@role_required('Teacher', 'Admin')
+@role_required('Faculty', 'Admin')
 def approve_note(note_id):
     note = Note.query.get_or_404(note_id)
     note.is_verified = True
@@ -204,7 +213,7 @@ def delete_note(note_id):
     note = Note.query.get_or_404(note_id)
     
     # Permission check: Teacher/Admin or Uploader
-    can_delete = current_user.role.name in ['Teacher', 'Admin'] or current_user.id == note.user_id
+    can_delete = current_user.role.name in ['Faculty', 'Admin'] or current_user.id == note.user_id
     if not can_delete:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('notes.list_notes'))
@@ -237,7 +246,7 @@ def edit_note(note_id):
     note = Note.query.get_or_404(note_id)
     
     # Permission check: Teacher/Admin or Uploader
-    can_edit = current_user.role.name in ['Teacher', 'Admin'] or current_user.id == note.user_id
+    can_edit = current_user.role.name in ['Faculty', 'Admin'] or current_user.id == note.user_id
     if not can_edit:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('notes.list_notes'))
@@ -257,7 +266,7 @@ def edit_note(note_id):
 
 @notes.route('/notes/reject/<int:note_id>')
 @login_required
-@role_required('Teacher', 'Admin')
+@role_required('Faculty', 'Admin')
 def reject_note(note_id):
     note = Note.query.get_or_404(note_id)
     # Ideally we might delete the file or mark as rejected. Let's delete for now to clean up? 

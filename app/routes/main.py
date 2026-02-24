@@ -4,56 +4,48 @@ from app.decorators import role_required
 
 main = Blueprint('main', __name__)
 
-@main.route('/teacher/logs')
+@main.route('/faculty/logs')
 @login_required
-@role_required('Teacher')
+@role_required('Faculty')
 def view_student_logs():
-    # Filter logs for 'Student' role users in THIS college
+    # Filter logs for 'Student' role users
     from app.models import ActivityLog, User, Role
     logs = ActivityLog.query.join(User).join(Role).filter(
-        Role.name == 'Student',
-        User.college_id == current_user.college_id
+        Role.name == 'Student'
     ).order_by(ActivityLog.timestamp.desc()).all()
-    return render_template('teacher/logs.html', logs=logs, title='Student Activity Logs')
+    return render_template('faculty/logs.html', logs=logs, title='Student Activity Logs')
 
 @main.route('/')
 def index():
     if current_user.is_authenticated:
         if current_user.role.name == 'Admin':
             return redirect(url_for('admin.dashboard'))
-        elif current_user.role.name == 'Teacher':
-            return redirect(url_for('main.teacher_dashboard'))
+        elif current_user.role.name == 'Faculty':
+            return redirect(url_for('main.faculty_dashboard'))
         else:
             return redirect(url_for('notes.list_notes'))
     return render_template('index.html') # Landing page
 
-@main.route('/teacher/dashboard')
+@main.route('/faculty/dashboard')
 @login_required
-def teacher_dashboard():
-    if current_user.role.name != 'Teacher':
+def faculty_dashboard():
+    if current_user.role.name != 'Faculty':
         return redirect(url_for('main.index'))
     from app.models import Course, Note, Role, User
-    courses = Course.query.filter_by(college_id=current_user.college_id).all()
+    courses = Course.query.all()
     
     # Fetch verified students for THIS college
     verified_students = User.query.join(Role).filter(
         User.is_verified == True,
-        Role.name == 'Student',
-        User.college_id == current_user.college_id
+        Role.name == 'Student'
     ).all()
 
-    # Fetch notes belonging to users in this college
-    verified_notes = Note.query.join(User).filter(
-        Note.is_verified == True,
-        User.college_id == current_user.college_id
-    ).all()
+    # Fetch notes
+    verified_notes = Note.query.filter_by(is_verified=True).all()
 
-    pending_notes = Note.query.join(User).filter(
-        Note.is_verified == False,
-        User.college_id == current_user.college_id
-    ).all()
+    pending_notes = Note.query.filter_by(is_verified=False).all()
 
-    return render_template('teacher/dashboard.html', 
+    return render_template('faculty/dashboard.html', 
                            courses=courses, 
                            verified_students=verified_students,
                            verified_notes=verified_notes,
@@ -61,7 +53,7 @@ def teacher_dashboard():
 
 @main.route('/student/report/<int:user_id>')
 @login_required
-@role_required('Teacher', 'Admin')
+@role_required('Faculty', 'Admin')
 def student_report(user_id):
     import io
     import csv
@@ -69,11 +61,12 @@ def student_report(user_id):
     from app.models import ActivityLog, User
     
     user = User.query.get_or_404(user_id)
-    # Security: Teacher can only see reports of students in their college
-    if user.college_id != current_user.college_id or user.role.name != 'Student':
+    # Security: Faculty can only see reports of students in their college
+    # Security: Faculty can only see reports of students
+    if user.role.name != 'Student':
         from flask import flash
         flash('Unauthorized access.', 'danger')
-        return redirect(url_for('main.teacher_dashboard'))
+        return redirect(url_for('main.faculty_dashboard'))
     
     logs = ActivityLog.query.filter_by(user_id=user.id).order_by(ActivityLog.timestamp.desc()).all()
     
@@ -98,9 +91,9 @@ def student_report(user_id):
     log_activity('Generate Report', f'Generated activity report for student {user.username}')
     return response
 
-@main.route('/teacher/download_student_logs')
+@main.route('/faculty/download_student_logs')
 @login_required
-@role_required('Teacher')
+@role_required('Faculty')
 def download_student_logs():
     import io
     import csv
@@ -108,8 +101,7 @@ def download_student_logs():
     from flask import make_response
     
     logs = ActivityLog.query.join(User).join(Role).filter(
-        Role.name == 'Student',
-        User.college_id == current_user.college_id
+        Role.name == 'Student'
     ).order_by(ActivityLog.timestamp.desc()).all()
     
     output = io.StringIO()
@@ -131,6 +123,6 @@ def download_student_logs():
     response.headers['Content-Type'] = 'text/csv'
     
     from app.utils import log_activity
-    log_activity('Download Bulk Logs', 'Teacher downloaded bulk activity logs for students')
+    log_activity('Download Bulk Logs', 'Faculty downloaded bulk activity logs for students')
     return response
 

@@ -60,10 +60,10 @@
         <a href="{{ url_for('admin.view_faculty') }}" class="mat-card p-6 text-center group no-underline">
             <div
                 class="w-12 h-12 mx-auto flex items-center justify-center mb-4 rounded-xl bg-soft-bg text-soft-primary group-hover:bg-soft-primary group-hover:text-white transition-colors">
-                <i class="fas fa-chalkboard-teacher text-lg"></i>
+                <i class="fas fa-chalkboard-user text-lg"></i>
             </div>
-            <div class="text-2xl font-black text-soft-dark mb-0.5">{{ verified_teachers|length }}</div>
-            <div class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-widest">Teachers</div>
+            <div class="text-2xl font-black text-soft-dark mb-0.5">{{ verified_facultys|length }}</div>
+            <div class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-widest">Faculty</div>
         </a>
         <a href="{{ url_for('admin.view_students') }}" class="mat-card p-6 text-center group no-underline">
             <div
@@ -77,8 +77,8 @@
             <div class="w-12 h-12 mx-auto flex items-center justify-center mb-4 rounded-xl bg-red-50 text-red-500">
                 <i class="fas fa-key text-lg"></i>
             </div>
-            <div class="text-2xl font-black text-red-600 mb-0.5">{{ pending_teachers|length }}</div>
-            <div class="text-[0.6rem] font-bold text-red-300 uppercase tracking-widest">New Teacher Requests</div>
+            <div class="text-2xl font-black text-red-600 mb-0.5">{{ pending_facultys|length }}</div>
+            <div class="text-[0.6rem] font-bold text-red-300 uppercase tracking-widest">New Faculty Requests</div>
         </div>
     </div>
 
@@ -98,7 +98,7 @@
                     class="bg-gray-50 hover:bg-gray-100 p-5 rounded-2xl no-underline group flex justify-between items-center transition-colors">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-users text-gray-400 group-hover:text-soft-primary"></i>
-                        <span class="text-[0.75rem] font-bold text-soft-dark uppercase tracking-tight">Teacher
+                        <span class="text-[0.75rem] font-bold text-soft-dark uppercase tracking-tight">Faculty
                             List</span>
                     </div>
                     <i class="fas fa-chevron-right text-gray-200 group-hover:text-soft-primary transition-colors"></i>
@@ -128,29 +128,29 @@
                 <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-soft-primary">
                     <i class="fas fa-user-check"></i>
                 </div>
-                <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">New Teachers waiting for approval
+                <h5 class="text-sm font-bold text-soft-dark uppercase tracking-wider">New Faculty waiting for approval
                 </h5>
             </div>
 
-            {% if pending_teachers %}
+            {% if pending_facultys %}
             <div class="flex flex-col gap-4">
-                {% for teacher in pending_teachers %}
+                {% for faculty in pending_facultys %}
                 <div
                     class="bg-white border border-gray-100 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 hover:border-soft-primary/20 transition-colors">
                     <div class="flex items-center gap-4">
                         <div
                             class="w-10 h-10 rounded-lg bg-soft-bg flex items-center justify-center text-soft-primary font-bold">
-                            {{ teacher.username[0]|upper }}
+                            {{ faculty.username[0]|upper }}
                         </div>
                         <div>
-                            <div class="text-sm font-bold text-soft-dark">{{ teacher.username }}</div>
-                            <div class="text-[0.65rem] font-medium text-gray-400">{{ teacher.email }}</div>
+                            <div class="text-sm font-bold text-soft-dark">{{ faculty.username }}</div>
+                            <div class="text-[0.65rem] font-medium text-gray-400">{{ faculty.email }}</div>
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <a href="{{ url_for('admin.verify_teacher', user_id=teacher.id, action='approve') }}"
+                        <a href="{{ url_for('admin.verify_faculty', user_id=faculty.id, action='approve') }}"
                             class="mat-button mat-button-primary px-5 py-2 text-[0.6rem] rounded-full">Approve</a>
-                        <a href="{{ url_for('admin.verify_teacher', user_id=teacher.id, action='reject') }}"
+                        <a href="{{ url_for('admin.verify_faculty', user_id=faculty.id, action='reject') }}"
                             class="mat-button px-5 py-2 text-[0.6rem] text-red-500 border border-red-50 hover:bg-red-50 rounded-full"
                             onclick="return confirm('Reject access?');">Reject</a>
                     </div>
@@ -178,42 +178,139 @@
                     <p class="text-[0.65rem] font-medium text-gray-400">Manage what students study</p>
                 </div>
             </div>
-            <div class="flex gap-3">
-                <a href="{{ url_for('admin.manage_course') }}"
-                    class="mat-button mat-button-primary px-5 py-2 text-[0.7rem] no-underline rounded-full flex items-center gap-2">
-                    <i class="fas fa-plus text-[0.6rem]"></i> New Course
+            <div class="flex gap-4">
+                <a href="{{ url_for('admin.add_student_registry') }}"
+                    class="mat-button px-6 py-2 text-[0.6rem] no-underline">
+                    <i class="fas fa-user-plus mr-1"></i> Add Student
                 </a>
                 <a href="{{ url_for('admin.upload_student_data') }}"
-                    class="mat-button mat-button-outline px-5 py-2 text-[0.7rem] no-underline rounded-full flex items-center gap-2">
-                    <i class="fas fa-file-import text-[0.6rem]"></i> Import Registry
+                    class="mat-button px-6 py-2 text-[0.6rem] no-underline">
+                    <i class="fas fa-file-import mr-1"></i> Upload Registry
+                </a>
+                <a href="{{ url_for('admin.manage_course') }}"
+                    class="mat-button mat-button-primary px-6 py-2 text-[0.6rem] no-underline">
+                    <i class="fas fa-plus mr-1"></i> Add Course
                 </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for course in courses %}
-            <div
-                class="bg-gray-50/50 border border-gray-100 p-6 rounded-3xl hover:border-soft-primary/20 transition-colors group">
-                <div class="flex justify-between items-center mb-6">
-                    <h4 class="text-xs font-bold text-soft-dark uppercase tracking-wider">{{ course.name }}</h4>
-                    <a href="{{ url_for('admin.edit_course', course_id=course.id) }}"
-                        class="text-gray-300 hover:text-soft-primary transition-colors"><i
-                            class="fas fa-edit text-xs"></i></a>
+            <div class="nm-flat overflow-hidden border border-gray-100/50 flex flex-col h-fit">
+                <!-- Course Header / Primary Toggle -->
+                <div class="flex flex-col p-6 bg-white/40 hover:bg-white transition-all cursor-pointer group"
+                    data-bs-toggle="collapse" data-bs-target="#course-{{ course.id }}" aria-expanded="false">
+                    <div class="flex items-start justify-between mb-4">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-soft-bg flex items-center justify-center text-soft-primary shadow-sm">
+                            <i class="fas fa-graduation-cap text-sm"></i>
+                        </div>
+                        <i
+                            class="fas fa-chevron-down text-gray-300 transition-transform group-aria-expanded:rotate-180"></i>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-black text-soft-dark uppercase tracking-tight mb-1 leading-tight">{{
+                            course.name }}</h4>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-widest">{{
+                                course.semesters|length }} Semesters</span>
+                            <div class="w-1 h-1 rounded-full bg-gray-200"></div>
+                            <span class="text-[0.55rem] font-bold text-soft-primary/60 uppercase tracking-widest">Core
+                                System</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 mt-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onclick="event.stopPropagation();">
+                        <a href="{{ url_for('admin.manage_semester', next=url_for('admin.dashboard')) }}?course={{ course.id }}"
+                            class="mat-button px-4 py-1.5 text-[0.6rem] no-underline rounded-full bg-white shadow-sm border border-gray-100 hover:border-soft-primary/30">
+                            <i class="fas fa-plus mr-1"></i> Add Semester
+                        </a>
+                        <a href="{{ url_for('admin.edit_course', course_id=course.id) }}"
+                            class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-400 hover:text-soft-primary shadow-sm border border-gray-100">
+                            <i class="fas fa-pen text-[0.7rem]"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="space-y-5">
-                    {% for sem in course.semesters %}
-                    <div class="pl-4 border-l-2 border-gray-100">
-                        <span class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-widest block mb-2">Phase
-                            {{ sem.number }}</span>
-                        <div class="flex flex-wrap gap-2">
-                            {% for sub in sem.subjects %}
-                            <span
-                                class="bg-white border border-gray-100 px-3 py-1 text-[0.6rem] font-bold text-gray-600 rounded-full shadow-sm">{{
-                                sub.name }}</span>
+
+                <!-- Course Content (Semester Accordion) -->
+                <div class="collapse" id="course-{{ course.id }}">
+                    <div class="p-5 bg-gray-50/10 border-t border-gray-100/50">
+                        <div class="flex flex-col gap-3">
+                            {% for sem in course.semesters %}
+                            <div class="group/sem">
+                                <!-- Semester Header / Secondary Toggle -->
+                                <div class="flex justify-between items-center p-3.5 rounded-2xl bg-white hover:bg-gray-50 transition-all cursor-pointer shadow-sm border border-gray-100/80"
+                                    data-bs-toggle="collapse" data-bs-target="#sem-{{ sem.id }}" aria-expanded="false">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-soft-primary/40"></div>
+                                        <span
+                                            class="text-[0.65rem] font-black text-soft-dark uppercase tracking-widest">Semester
+                                            {{ sem.number }}</span>
+                                        <span class="text-[0.55rem] font-bold text-gray-400 opacity-60 ml-1">({{
+                                            sem.subjects|length }} Units)</span>
+                                    </div>
+                                    <!-- Management Icons -->
+                                    <div class="flex gap-2 opacity-0 group-hover/sem:opacity-100 transition-opacity"
+                                        onclick="event.stopPropagation();">
+                                        <a href="{{ url_for('admin.manage_subject', next=url_for('admin.dashboard')) }}?semester={{ sem.id }}"
+                                            class="text-gray-300 hover:text-soft-primary" title="Add Subject">
+                                            <i class="fas fa-plus-circle text-[0.7rem]"></i>
+                                        </a>
+                                        <a href="{{ url_for('admin.edit_semester', sem_id=sem.id) }}"
+                                            class="text-gray-300 hover:text-soft-primary" title="Edit Semester">
+                                            <i class="fas fa-pen text-[0.6rem]"></i>
+                                        </a>
+                                        <form action="{{ url_for('admin.delete_semester', sem_id=sem.id) }}"
+                                            method="POST" class="inline" onsubmit="return confirm('Delete Semester?');">
+                                            <button type="submit" class="text-gray-200 hover:text-red-400">
+                                                <i class="fas fa-trash text-[0.6rem]"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Subjects Collapse Content -->
+                                <div class="collapse" id="sem-{{ sem.id }}">
+                                    <div
+                                        class="flex flex-col gap-2 py-4 pl-5 border-l-2 border-soft-primary/5 ml-4 mt-1">
+                                        {% if sem.subjects %}
+                                        {% for sub in sem.subjects %}
+                                        <div
+                                            class="group/sub flex items-center justify-between py-1.5 pr-3 bg-white/50 rounded-xl px-3 border border-transparent hover:border-gray-100 transition-all">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fas fa-book-open text-[0.5rem] text-soft-primary/30"></i>
+                                                <span class="text-[0.6rem] font-bold text-gray-600 tracking-tight">{{
+                                                    sub.name }}</span>
+                                            </div>
+                                            <div
+                                                class="flex gap-2 opacity-0 group-hover/sub:opacity-100 transition-opacity">
+                                                <a href="{{ url_for('admin.edit_subject', sub_id=sub.id) }}"
+                                                    class="text-gray-300 hover:text-soft-primary"><i
+                                                        class="fas fa-pen text-[0.55rem]"></i></a>
+                                                <form action="{{ url_for('admin.delete_subject', sub_id=sub.id) }}"
+                                                    method="POST" class="inline"
+                                                    onsubmit="return confirm('Delete Subject?');">
+                                                    <button type="submit" class="text-gray-300 hover:text-red-400">
+                                                        <i class="fas fa-times text-[0.55rem]"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        {% else %}
+                                        <div class="flex items-center gap-2 text-gray-300 py-1">
+                                            <i class="fas fa-ghost text-[0.6rem]"></i>
+                                            <span class="text-[0.55rem] font-bold uppercase italic">Empty Node</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
             </div>
             {% endfor %}
